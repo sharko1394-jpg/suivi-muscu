@@ -30,23 +30,31 @@ export function PageHeader({
   title,
   subtitle,
   backTo,
+  onBack,
   action,
 }: {
   title: string;
   subtitle?: string;
+  /** Page vers laquelle la flèche de retour ramène. */
   backTo?: string;
+  /** À la place de backTo : action à faire au retour (ex. revenir à la page précédente). */
+  onBack?: () => void;
   action?: ReactNode;
 }) {
+  const backClass =
+    '-ml-3 flex size-12 shrink-0 items-center justify-center rounded-full active:bg-raised';
   return (
     <header className="sticky top-0 z-10 flex items-center gap-1 border-b border-line/60 bg-bg/90 px-4 pb-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] backdrop-blur">
-      {backTo && (
-        <Link
-          to={backTo}
-          aria-label="Retour"
-          className="-ml-3 flex size-12 shrink-0 items-center justify-center rounded-full active:bg-raised"
-        >
+      {onBack ? (
+        <button type="button" onClick={onBack} aria-label="Retour" className={backClass}>
           <IconChevronLeft />
-        </Link>
+        </button>
+      ) : (
+        backTo && (
+          <Link to={backTo} aria-label="Retour" className={backClass}>
+            <IconChevronLeft />
+          </Link>
+        )
       )}
       <div className="min-w-0 flex-1">
         <h1 className="truncate text-2xl font-bold">{title}</h1>

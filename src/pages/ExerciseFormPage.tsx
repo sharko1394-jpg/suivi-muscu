@@ -5,8 +5,10 @@ import {
   EQUIPMENT_LABELS,
   MUSCLES,
   MUSCLE_LABELS,
+  addPlannedExercise,
   createExercise,
   getExercise,
+  replacePlannedExercise,
   setExerciseArchived,
   updateExercise,
   useLive,
@@ -40,18 +42,33 @@ export function ExerciseFormPage() {
     );
   }
 
-  const suggestedName = (location.state as { name?: string } | null)?.name ?? '';
+  const state = location.state as FormState | null;
   return (
-    <ExerciseForm key={id ?? 'nouveau'} exercise={loaded.exercise} suggestedName={suggestedName} />
+    <ExerciseForm
+      key={id ?? 'nouveau'}
+      exercise={loaded.exercise}
+      suggestedName={state?.name ?? ''}
+      thenAddTo={state?.thenAddTo ?? null}
+    />
   );
+}
+
+/** Ce que la page d'origine peut transmettre au formulaire de création. */
+interface FormState {
+  /** Nom déjà tapé dans la recherche. */
+  name?: string;
+  /** Séance du programme où placer l'exercice dès sa création (ajout ou remplacement). */
+  thenAddTo?: { workoutId: string; replaceItemId: string | null };
 }
 
 function ExerciseForm({
   exercise,
   suggestedName,
+  thenAddTo,
 }: {
   exercise: Exercise | null;
   suggestedName: string;
+  thenAddTo: FormState['thenAddTo'] | null;
 }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -84,9 +101,21 @@ function ExerciseForm({
     setError(null);
     try {
       const input = { name, primaryMuscle, secondaryMuscles, equipment };
-      if (exercise) await updateExercise(exercise.id, input);
-      else await createExercise(input);
-      toast(exercise ? 'Exercice modifié' : 'Exercice créé');
+      if (exercise) {
+        await updateExercise(exercise.id, input);
+        toast('Exercice modifié');
+      } else {
+        const created = await createExercise(input);
+        if (thenAddTo?.replaceItemId) {
+          await replacePlannedExercise(thenAddTo.workoutId, thenAddTo.replaceItemId, created.id);
+          toast('Exercice créé et mis à la place de l’ancien');
+        } else if (thenAddTo) {
+          await addPlannedExercise(thenAddTo.workoutId, created.id);
+          toast('Exercice créé et ajouté à la séance');
+        } else {
+          toast('Exercice créé');
+        }
+      }
       leave();
     } catch (e) {
       setError(messageOf(e));
@@ -112,7 +141,12 @@ function ExerciseForm({
 
   return (
     <>
-      <PageHeader title={exercise ? 'Modifier l’exercice' : 'Nouvel exercice'} backTo={LIST} />
+      <PageHeader
+        title={exercise ? 'Modifier l’exercice' : 'Nouvel exercice'}
+        backTo={LIST}
+        // Venu d'une séance du programme : la flèche y ramène, pas à la bibliothèque.
+        onBack={thenAddTo ? leave : undefined}
+      />
       {/* Dès qu'un champ change, le message d'erreur précédent n'a plus lieu d'être. */}
       <form
         onSubmit={save}

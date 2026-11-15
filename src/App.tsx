@@ -3,9 +3,12 @@ import { Navigate, Route, Routes } from 'react-router';
 import { initData } from './data';
 import { ExerciseFormPage } from './pages/ExerciseFormPage';
 import { ExercisesPage } from './pages/ExercisesPage';
-import { HistoryPage, ProgramPage, StatsPage } from './pages/placeholders';
+import { HistoryPage, StatsPage } from './pages/placeholders';
+import { ProgramHome, ProgramListPage } from './pages/ProgramListPage';
+import { ProgramPage } from './pages/ProgramPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { TodayPage } from './pages/TodayPage';
+import { WorkoutPage } from './pages/WorkoutPage';
 import { AppShell } from './ui/AppShell';
 import { Button } from './ui/components';
 import { ToastProvider } from './ui/toast';
@@ -33,7 +36,10 @@ export default function App() {
       <Routes>
         <Route element={<AppShell />}>
           <Route index element={<TodayPage />} />
-          <Route path="programme" element={<ProgramPage />} />
+          <Route path="programme" element={<ProgramHome />} />
+          <Route path="programme/tous" element={<ProgramListPage />} />
+          <Route path="programme/p/:programId" element={<ProgramPage />} />
+          <Route path="programme/p/:programId/s/:workoutId" element={<WorkoutPage />} />
           <Route path="historique" element={<HistoryPage />} />
           <Route path="stats" element={<StatsPage />} />
           <Route path="reglages" element={<SettingsPage />} />

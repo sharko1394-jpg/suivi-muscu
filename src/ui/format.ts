@@ -1,4 +1,35 @@
-import { DAY_MS, AppError, localDate, type DataCounts } from '../data';
+import { DAY_MS, AppError, localDate, type DataCounts, type PlannedExercise } from '../data';
+
+/** Nombre à la française : 82.5 → « 82,5 ». */
+export function formatNumber(value: number): string {
+  return String(Math.round(value * 100) / 100).replace('.', ',');
+}
+
+export const formatKg = (kg: number) => `${formatNumber(kg)} kg`;
+
+/** Durée de repos : « 45 s », « 2 min », « 2 min 30 ». */
+export function formatRest(seconds: number): string {
+  const minutes = Math.floor(seconds / 60);
+  const rest = seconds % 60;
+  if (minutes === 0) return `${rest} s`;
+  return rest === 0 ? `${minutes} min` : `${minutes} min ${String(rest).padStart(2, '0')}`;
+}
+
+/** Fourchette de répétitions : « 8–12 », ou « 10 » si min = max. */
+export const formatReps = (min: number, max: number) => (min === max ? `${min}` : `${min}–${max}`);
+
+/** Résumé d'un exercice prévu : « 3 × 8–12 · 80 kg · repos 2 min 30 ». */
+export function formatPlanned(
+  item: Pick<PlannedExercise, 'sets' | 'repMin' | 'repMax' | 'targetWeight' | 'restSec'>,
+): string {
+  return [
+    `${item.sets} × ${formatReps(item.repMin, item.repMax)}`,
+    item.targetWeight === null ? null : formatKg(item.targetWeight),
+    item.restSec === 0 ? 'sans repos' : `repos ${formatRest(item.restSec)}`,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+}
 
 const dateTime = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeStyle: 'short' });
 const longDay = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });

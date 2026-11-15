@@ -12,6 +12,7 @@ export * from './labels';
 export { AppError, normalizeText, localDate, DAY_MS } from './util';
 export { CURRENT_VERSION } from './schema';
 export * from './exercises';
+export * from './programs';
 export * from './settings';
 export * from './backup';
 export * from './storage';

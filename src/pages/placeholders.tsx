@@ -2,18 +2,6 @@ import { ComingSoon, PageHeader } from '../ui/components';
 
 // Pages provisoires, remplacées au fil des étapes de construction.
 
-export function ProgramPage() {
-  return (
-    <>
-      <PageHeader title="Programme" />
-      <ComingSoon step={2}>
-        Ici, tu créeras tes programmes et leurs séances : exercices, séries, répétitions, temps de
-        repos.
-      </ComingSoon>
-    </>
-  );
-}
-
 export function HistoryPage() {
   return (
     <>

@@ -1,4 +1,16 @@
-import type { Equipment, Muscle, SetType } from './types';
+import type { Equipment, Muscle, SetType, Weekday } from './types';
+
+export const WEEKDAY_LABELS: Record<Weekday, string> = {
+  1: 'Lundi',
+  2: 'Mardi',
+  3: 'Mercredi',
+  4: 'Jeudi',
+  5: 'Vendredi',
+  6: 'Samedi',
+  7: 'Dimanche',
+};
+
+export const WEEKDAYS: Weekday[] = [1, 2, 3, 4, 5, 6, 7];
 
 export const MUSCLE_LABELS: Record<Muscle, string> = {
   pectoraux: 'Pectoraux',

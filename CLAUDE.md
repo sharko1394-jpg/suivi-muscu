@@ -16,6 +16,8 @@ sur iPhone. Le cahier des charges complet est dans `docs/cahier-des-charges.md` 
 - Modifier le programme ne modifie jamais l'historique : une séance réalisée garde ses copies
   figées (`sessions`, `sessionExercises`, `sets`).
 - Les écrans n'importent que `src/data` (son `index.ts`), jamais Dexie ni `db.ts` directement.
+- `src/data/programs.ts` n'écrit que dans `programs` et `programWorkouts`. En rotation, le cycle
+  suit l'ordre des séances ; l'avancer après une séance réalisée ou passée est le rôle de l'étape 3.
 - Une erreur à montrer à l'utilisateur est une `AppError` avec un message en français.
   Ne pas la nommer `DataError` : Dexie réserve ce nom et l'emballerait.
 - Aucun backend, aucun compte, aucune donnée envoyée ailleurs. Pas de localStorage pour les données.
@@ -26,6 +28,14 @@ sur iPhone. Le cahier des charges complet est dans `docs/cahier-des-charges.md` 
 - Répondre en français, en tutoyant, avec des explications simples et sans jargon.
 - Avancer par étapes testables et dire à chaque fois comment tester sur l'iPhone.
 - Avant toute mise en ligne, `npm test` et `npm run build` doivent passer.
+- Une branche par étape (`etape-N-...`). La mise en ligne se fait en fusionnant la branche dans
+  `main` : un envoi sur `main` lance les tests puis publie le site. Demander l'accord de
+  l'utilisateur avant de fusionner, car cela met à jour l'appli sur son téléphone.
+
+## Adresse du site
+
+https://sharko1394-jpg.github.io/suivi-muscu/ (dépôt `sharko1394-jpg/suivi-muscu`).
+Les données de l'utilisateur sont attachées à cette adresse.
 
 ## Choix validés avec l'utilisateur
 
@@ -42,7 +52,8 @@ sur iPhone. Le cahier des charges complet est dans `docs/cahier-des-charges.md` 
 ## Avancement
 
 1. Données et sauvegarde : fait (avec la base PWA : installation, hors ligne, bandeau de mise à jour)
-2. Programme : à faire
+2. Programme : fait (programmes, séances, exercices prévus, supersets, rotation et jours fixes ;
+   l'accueil affiche la séance prévue, sans bouton Démarrer)
 3. Accueil et mode séance : à faire
 4. Historique : à faire
 5. Statistiques : à faire

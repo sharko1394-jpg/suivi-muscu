@@ -75,6 +75,40 @@ export const IconPlus = (p: IconProps) => (
   </Icon>
 );
 
+export const IconMinus = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M5 12h14" />
+  </Icon>
+);
+
+export const IconClose = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M6 6l12 12M18 6 6 18" />
+  </Icon>
+);
+
+/** Trois points : ouvre un menu d'actions. */
+export const IconMore = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M5 12h.01M12 12h.01M19 12h.01" strokeWidth="3" />
+  </Icon>
+);
+
+/** Poignée de déplacement (glisser-déposer). */
+export const IconGrip = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M5 8h14M5 12h14M5 16h14" />
+  </Icon>
+);
+
+/** Maillon : deux exercices liés en superset. */
+export const IconLink = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1" />
+    <path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1" />
+  </Icon>
+);
+
 export const IconSearch = (p: IconProps) => (
   <Icon {...p}>
     <circle cx="11" cy="11" r="7" />
