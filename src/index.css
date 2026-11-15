@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0a0c10;
+  --color-surface: #141920;
+  --color-raised: #1e2630;
+  --color-line: #2c3643;
+  --color-ink: #f4f6f8;
+  --color-muted: #a3aebb;
+  --color-accent: #c6f135;
+  --color-accent-ink: #11160a;
+  --color-danger: #ff7b7b;
+  --color-gold: #ffc53d;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  html {
+    color-scheme: dark;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: none;
+    /* Pas de zoom au double tap : les boutons répondent tout de suite. */
+    touch-action: manipulation;
+  }
+
+  /* En dessous de 16px, l'iPhone zoome sur le champ dès qu'on le touche. */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  button,
+  a {
+    cursor: pointer;
+    -webkit-touch-callout: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
