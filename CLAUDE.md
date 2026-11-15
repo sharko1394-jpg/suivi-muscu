@@ -17,7 +17,16 @@ sur iPhone. Le cahier des charges complet est dans `docs/cahier-des-charges.md` 
   figées (`sessions`, `sessionExercises`, `sets`).
 - Les écrans n'importent que `src/data` (son `index.ts`), jamais Dexie ni `db.ts` directement.
 - `src/data/programs.ts` n'écrit que dans `programs` et `programWorkouts`. En rotation, le cycle
-  suit l'ordre des séances ; l'avancer après une séance réalisée ou passée est le rôle de l'étape 3.
+  suit l'ordre des séances ; `finishSession` et `skipPlannedWorkout` (`sessions.ts`) le font avancer.
+- `src/data/sessions.ts` ne modifie le programme que dans deux cas : avancer la rotation, et
+  « remplacer aussi dans le programme » (qui passe par `replacePlannedExercise`).
+- Une série « compte » (volume, records, stats) si elle est validée, complète et n'est pas un
+  échauffement : toujours passer par `isCountedSet` (`calc.ts`), jamais refaire ce tri à la main.
+- Records en direct : charge la plus lourde, meilleur 1RM estimé (Epley, 12 répétitions au plus),
+  plus de répétitions à la même charge. Il faut faire strictement mieux, et la première séance
+  d'un exercice n'en bat aucun.
+- Le minuteur de repos et la séance « passée » du jour vivent dans les réglages (`restTimer`,
+  `skippedDay`), pas dans l'état de l'écran : ils survivent à une fermeture de l'appli.
 - Une erreur à montrer à l'utilisateur est une `AppError` avec un message en français.
   Ne pas la nommer `DataError` : Dexie réserve ce nom et l'emballerait.
 - Aucun backend, aucun compte, aucune donnée envoyée ailleurs. Pas de localStorage pour les données.
@@ -54,7 +63,8 @@ Les données de l'utilisateur sont attachées à cette adresse.
 1. Données et sauvegarde : fait (avec la base PWA : installation, hors ligne, bandeau de mise à jour)
 2. Programme : fait (programmes, séances, exercices prévus, supersets, rotation et jours fixes ;
    l'accueil affiche la séance prévue, sans bouton Démarrer)
-3. Accueil et mode séance : à faire
+3. Accueil et mode séance : fait (démarrer, saisir, minuteur de repos, records en direct, bilan ;
+   réglages de séance ; pas de charge par exercice)
 4. Historique : à faire
 5. Statistiques : à faire
 6. Finitions PWA et README en français : à faire

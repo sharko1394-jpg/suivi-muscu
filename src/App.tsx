@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Navigate, Route, Routes } from 'react-router';
-import { initData } from './data';
+import { Navigate, Route, Routes, useNavigate } from 'react-router';
+import { getActiveSession, initData } from './data';
 import { ExerciseFormPage } from './pages/ExerciseFormPage';
 import { ExercisesPage } from './pages/ExercisesPage';
 import { HistoryPage, StatsPage } from './pages/placeholders';
 import { ProgramHome, ProgramListPage } from './pages/ProgramListPage';
 import { ProgramPage } from './pages/ProgramPage';
+import { SESSION_PATH, SessionPage } from './pages/SessionPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { SummaryPage } from './pages/SummaryPage';
 import { TodayPage } from './pages/TodayPage';
 import { WorkoutPage } from './pages/WorkoutPage';
 import { AppShell } from './ui/AppShell';
@@ -17,13 +19,22 @@ type Boot = { status: 'loading' } | { status: 'ready' } | { status: 'error'; err
 
 export default function App() {
   const [boot, setBoot] = useState<Boot>({ status: 'loading' });
+  const navigate = useNavigate();
 
   const start = useCallback(() => {
     setBoot({ status: 'loading' });
-    initData().then(
-      () => setBoot({ status: 'ready' }),
-      (error) => setBoot({ status: 'error', error }),
-    );
+    initData()
+      .then(async () => {
+        // Appli rouverte en pleine séance : on revient directement dessus.
+        const openedAtHome = ['', '#', '#/'].includes(window.location.hash);
+        if (openedAtHome && (await getActiveSession())) navigate(SESSION_PATH, { replace: true });
+      })
+      .then(
+        () => setBoot({ status: 'ready' }),
+        (error) => setBoot({ status: 'error', error }),
+      );
+    // `navigate` est stable : le démarrage ne doit se faire qu'une fois.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(start, [start]);
@@ -34,8 +45,11 @@ export default function App() {
   return (
     <ToastProvider>
       <Routes>
+        {/* L'écran de séance occupe tout l'écran, sans la barre d'onglets. */}
+        <Route path="seance" element={<SessionPage />} />
         <Route element={<AppShell />}>
           <Route index element={<TodayPage />} />
+          <Route path="bilan/:sessionId" element={<SummaryPage />} />
           <Route path="programme" element={<ProgramHome />} />
           <Route path="programme/tous" element={<ProgramListPage />} />
           <Route path="programme/p/:programId" element={<ProgramPage />} />

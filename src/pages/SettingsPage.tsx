@@ -2,6 +2,7 @@ import { useRef, useState, type ChangeEvent } from 'react';
 import {
   BACKUP_REMINDER_DAYS,
   CURRENT_VERSION,
+  WEIGHT_STEPS,
   backupFileName,
   backupToCurrentData,
   buildHistoryCsv,
@@ -12,6 +13,7 @@ import {
   markBackupDone,
   parseBackup,
   requestPersistence,
+  setSetting,
   useBackupDue,
   useDataCounts,
   useSettings,
@@ -20,11 +22,14 @@ import {
   type DataCounts,
 } from '../data';
 import { Button, Card, ConfirmDialog, LinkRow, PageHeader, Section } from '../ui/components';
+import { Stepper, Switch } from '../ui/controls';
 import {
   describeCounts,
   formatAgo,
   formatBytes,
   formatDateTime,
+  formatNumber,
+  formatRest,
   messageOf,
   plural,
 } from '../ui/format';
@@ -121,6 +126,18 @@ export function SettingsPage() {
       else toast('Le téléphone n’a pas accordé la protection pour l’instant.', 'error');
     });
 
+  /** Passe au pas de charge précédent ou suivant dans la liste proposée. */
+  const stepWeight = (direction: 1 | -1) => {
+    if (!settings) return;
+    const current = WEIGHT_STEPS.reduce((best, step, index) =>
+      Math.abs(step - settings.weightStep) < Math.abs(WEIGHT_STEPS[best] - settings.weightStep)
+        ? index
+        : best,
+    0);
+    const next = WEIGHT_STEPS[Math.min(WEIGHT_STEPS.length - 1, Math.max(0, current + direction))];
+    void setSetting('weightStep', next);
+  };
+
   const lastBackup = settings?.lastBackupAt ?? null;
 
   return (
@@ -178,6 +195,55 @@ export function SettingsPage() {
             </p>
           </Card>
         </Section>
+
+        {settings && (
+          <Section title="Séance">
+            <Card className="space-y-5">
+              <Stepper
+                label="Pas de charge"
+                value={`${formatNumber(settings.weightStep)} kg`}
+                onDecrement={() => stepWeight(-1)}
+                onIncrement={() => stepWeight(1)}
+                canDecrement={settings.weightStep > WEIGHT_STEPS[0]}
+                canIncrement={settings.weightStep < WEIGHT_STEPS[WEIGHT_STEPS.length - 1]}
+              />
+              <Stepper
+                label="Pas de répétitions"
+                value={String(settings.repStep)}
+                onDecrement={() => void setSetting('repStep', settings.repStep - 1)}
+                onIncrement={() => void setSetting('repStep', settings.repStep + 1)}
+                canDecrement={settings.repStep > 1}
+                canIncrement={settings.repStep < 5}
+              />
+              <Stepper
+                label="Repos par défaut"
+                value={settings.defaultRestSec === 0 ? 'aucun' : formatRest(settings.defaultRestSec)}
+                onDecrement={() => void setSetting('defaultRestSec', settings.defaultRestSec - 15)}
+                onIncrement={() => void setSetting('defaultRestSec', settings.defaultRestSec + 15)}
+                canDecrement={settings.defaultRestSec > 0}
+                canIncrement={settings.defaultRestSec < 900}
+              />
+              <p className="text-sm text-muted">
+                Le pas est ce qu’ajoute ou retire un appui sur les boutons − et +. Tu peux en
+                choisir un autre pour un exercice précis, dans sa fiche. Le repos par défaut sert
+                aux exercices ajoutés en cours de séance et aux nouveaux exercices du programme.
+              </p>
+              <Switch
+                label="Son à la fin du repos"
+                detail="Sur iPhone, le son ne sort pas si le téléphone est en mode silencieux."
+                checked={settings.soundEnabled}
+                onChange={(checked) => void setSetting('soundEnabled', checked)}
+              />
+              {'vibrate' in navigator && (
+                <Switch
+                  label="Vibration à la fin du repos"
+                  checked={settings.vibrationEnabled}
+                  onChange={(checked) => void setSetting('vibrationEnabled', checked)}
+                />
+              )}
+            </Card>
+          </Section>
+        )}
 
         <Section title="Bibliothèque">
           <LinkRow

@@ -1,4 +1,58 @@
-import { DAY_MS, AppError, localDate, type DataCounts, type PlannedExercise } from '../data';
+import {
+  DAY_MS,
+  AppError,
+  localDate,
+  type DataCounts,
+  type Lift,
+  type PlannedExercise,
+  type SetEntry,
+} from '../data';
+
+const shortDay = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' });
+
+/** Jour 'AAAA-MM-JJ' → « 12 nov. » */
+export const formatShortDate = (date: string) => shortDay.format(new Date(`${date}T12:00:00`));
+
+/** Chronomètre : « 4:07 », « 1:02:15 ». */
+export function formatClock(totalSeconds: number): string {
+  const s = Math.max(0, Math.floor(totalSeconds));
+  const hours = Math.floor(s / 3600);
+  const minutes = Math.floor((s % 3600) / 60);
+  const seconds = String(s % 60).padStart(2, '0');
+  return hours > 0
+    ? `${hours}:${String(minutes).padStart(2, '0')}:${seconds}`
+    : `${minutes}:${seconds}`;
+}
+
+/** Durée d'une séance : « 52 min », « 1 h 05 ». */
+export function formatDuration(totalSeconds: number): string {
+  const minutes = Math.round(totalSeconds / 60);
+  if (minutes < 60) return `${minutes} min`;
+  return `${Math.floor(minutes / 60)} h ${String(minutes % 60).padStart(2, '0')}`;
+}
+
+/** Volume : « 4 250 kg ». */
+export const formatVolume = (kg: number) => `${Math.round(kg).toLocaleString('fr-FR')} kg`;
+
+/** Charge d'une série : « 82,5 kg », ou « poids du corps » pour 0 kg. */
+export const formatLoad = (weight: number) => (weight === 0 ? 'poids du corps' : formatKg(weight));
+
+/** Une série : « 82,5 kg × 8 ». */
+export function formatSet(set: Pick<SetEntry, 'weight' | 'reps'>): string {
+  const weight = set.weight === null ? '— kg' : formatLoad(set.weight);
+  return `${weight} × ${set.reps ?? '—'}`;
+}
+
+/** Plusieurs séries, regroupées par charge : « 80 kg × 8, 8, 7 · 60 kg × 12 ». */
+export function formatLifts(lifts: Lift[]): string {
+  const groups: { weight: number; reps: number[] }[] = [];
+  for (const lift of lifts) {
+    const last = groups[groups.length - 1];
+    if (last && last.weight === lift.weight) last.reps.push(lift.reps);
+    else groups.push({ weight: lift.weight, reps: [lift.reps] });
+  }
+  return groups.map((g) => `${formatLoad(g.weight)} × ${g.reps.join(', ')}`).join(' · ');
+}
 
 /** Nombre à la française : 82.5 → « 82,5 ». */
 export function formatNumber(value: number): string {

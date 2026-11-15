@@ -9,6 +9,8 @@ export interface ExerciseInput {
   primaryMuscle: Muscle;
   secondaryMuscles: Muscle[];
   equipment: Equipment;
+  /** Pas des boutons − et + propre à cet exercice, en kg ; null ou absent = réglage général. */
+  weightStep?: number | null;
 }
 
 const byName = (a: Exercise, b: Exercise) => a.name.localeCompare(b.name, 'fr');
@@ -50,7 +52,7 @@ async function validate(
   input: ExerciseInput,
   ignoreId: string | null,
   database: AppDB,
-): Promise<ExerciseInput> {
+): Promise<Required<ExerciseInput>> {
   const name = input.name.replace(/\s+/g, ' ').trim();
   if (name.length === 0) throw new AppError('Donne un nom à l’exercice.');
   if (name.length > 80) throw new AppError('Le nom est trop long (80 caractères maximum).');
@@ -72,7 +74,17 @@ async function validate(
   const secondaryMuscles = [...new Set(input.secondaryMuscles)].filter(
     (m) => m in MUSCLE_LABELS && m !== input.primaryMuscle,
   );
-  return { name, primaryMuscle: input.primaryMuscle, secondaryMuscles, equipment: input.equipment };
+  const step = input.weightStep ?? null;
+  if (step !== null && !(Number.isFinite(step) && step > 0 && step <= 50)) {
+    throw new AppError('Le pas de charge doit être compris entre 0 et 50 kg.');
+  }
+  return {
+    name,
+    primaryMuscle: input.primaryMuscle,
+    secondaryMuscles,
+    equipment: input.equipment,
+    weightStep: step,
+  };
 }
 
 export async function createExercise(input: ExerciseInput, database: AppDB = db): Promise<Exercise> {
@@ -84,7 +96,6 @@ export async function createExercise(input: ExerciseInput, database: AppDB = db)
       ...clean,
       isCustom: true,
       archived: false,
-      weightStep: null,
       createdAt: t,
       updatedAt: t,
     };
@@ -105,8 +116,13 @@ export async function updateExercise(
   await database.transaction('rw', database.exercises, async () => {
     const existing = await database.exercises.get(id);
     if (!existing) throw new AppError('Cet exercice n’existe plus.');
-    const clean = await validate(input, id, database);
-    await database.exercises.update(id, { ...clean, updatedAt: Date.now() });
+    const { weightStep, ...clean } = await validate(input, id, database);
+    await database.exercises.update(id, {
+      ...clean,
+      // Pas de charge non précisé : on garde celui qui était réglé.
+      ...(input.weightStep === undefined ? {} : { weightStep }),
+      updatedAt: Date.now(),
+    });
   });
 }
 

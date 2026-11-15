@@ -5,19 +5,22 @@ import {
   EQUIPMENT_LABELS,
   MUSCLES,
   MUSCLE_LABELS,
+  WEIGHT_STEPS,
   addPlannedExercise,
+  addSessionExercise,
   createExercise,
   getExercise,
   replacePlannedExercise,
   setExerciseArchived,
   updateExercise,
   useLive,
+  useSettings,
   type Equipment,
   type Exercise,
   type Muscle,
 } from '../data';
 import { Button, Card, Chip, PageHeader } from '../ui/components';
-import { messageOf } from '../ui/format';
+import { formatNumber, messageOf } from '../ui/format';
 import { useToast } from '../ui/toast';
 
 const LIST = '/reglages/exercices';
@@ -49,6 +52,7 @@ export function ExerciseFormPage() {
       exercise={loaded.exercise}
       suggestedName={state?.name ?? ''}
       thenAddTo={state?.thenAddTo ?? null}
+      thenAddToSession={state?.thenAddToSession ?? null}
     />
   );
 }
@@ -59,20 +63,26 @@ interface FormState {
   name?: string;
   /** Séance du programme où placer l'exercice dès sa création (ajout ou remplacement). */
   thenAddTo?: { workoutId: string; replaceItemId: string | null };
+  /** Séance en cours à laquelle ajouter l'exercice dès sa création. */
+  thenAddToSession?: string;
 }
 
 function ExerciseForm({
   exercise,
   suggestedName,
   thenAddTo,
+  thenAddToSession,
 }: {
   exercise: Exercise | null;
   suggestedName: string;
   thenAddTo: FormState['thenAddTo'] | null;
+  thenAddToSession: string | null;
 }) {
   const navigate = useNavigate();
   const location = useLocation();
   const toast = useToast();
+  const settings = useSettings();
+  const [weightStep, setWeightStep] = useState<number | null>(exercise?.weightStep ?? null);
 
   const [name, setName] = useState(exercise?.name ?? suggestedName);
   const [primaryMuscle, setPrimaryMuscle] = useState<Muscle | ''>(exercise?.primaryMuscle ?? '');
@@ -100,13 +110,16 @@ function ExerciseForm({
     setBusy(true);
     setError(null);
     try {
-      const input = { name, primaryMuscle, secondaryMuscles, equipment };
+      const input = { name, primaryMuscle, secondaryMuscles, equipment, weightStep };
       if (exercise) {
         await updateExercise(exercise.id, input);
         toast('Exercice modifié');
       } else {
         const created = await createExercise(input);
-        if (thenAddTo?.replaceItemId) {
+        if (thenAddToSession) {
+          await addSessionExercise(thenAddToSession, created.id);
+          toast('Exercice créé et ajouté à la séance');
+        } else if (thenAddTo?.replaceItemId) {
           await replacePlannedExercise(thenAddTo.workoutId, thenAddTo.replaceItemId, created.id);
           toast('Exercice créé et mis à la place de l’ancien');
         } else if (thenAddTo) {
@@ -144,8 +157,8 @@ function ExerciseForm({
       <PageHeader
         title={exercise ? 'Modifier l’exercice' : 'Nouvel exercice'}
         backTo={LIST}
-        // Venu d'une séance du programme : la flèche y ramène, pas à la bibliothèque.
-        onBack={thenAddTo ? leave : undefined}
+        // Venu d'une séance : la flèche y ramène, pas à la bibliothèque.
+        onBack={thenAddTo || thenAddToSession ? leave : undefined}
       />
       {/* Dès qu'un champ change, le message d'erreur précédent n'a plus lieu d'être. */}
       <form
@@ -214,6 +227,26 @@ function ExerciseForm({
             {EQUIPMENTS.map((e) => (
               <option key={e} value={e}>
                 {EQUIPMENT_LABELS[e]}
+              </option>
+            ))}
+          </select>
+        </Field>
+
+        <Field label="Pas de charge des boutons − et +" htmlFor="exercise-step">
+          <select
+            id="exercise-step"
+            value={weightStep ?? ''}
+            onChange={(event) =>
+              setWeightStep(event.target.value === '' ? null : Number(event.target.value))
+            }
+            className={fieldClass}
+          >
+            <option value="">
+              Réglage général{settings ? ` (${formatNumber(settings.weightStep)} kg)` : ''}
+            </option>
+            {WEIGHT_STEPS.map((step) => (
+              <option key={step} value={step}>
+                {formatNumber(step)} kg
               </option>
             ))}
           </select>

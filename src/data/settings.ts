@@ -16,7 +16,21 @@ export interface Settings {
   lastBackupAt: number | null;
   /** Le rappel de sauvegarde est masqué jusqu'à cette date. */
   backupSnoozedUntil: number | null;
+  /** Minuteur de repos en cours. Enregistré pour survivre à une fermeture de l'appli. */
+  restTimer: RestTimer | null;
+  /** Mode jours fixes : séance du jour que l'utilisateur a choisi de passer. */
+  skippedDay: { date: string; workoutId: string } | null;
 }
+
+export interface RestTimer {
+  /** Heure de fin du repos. */
+  endsAt: number;
+  /** Durée totale du repos, en secondes (pour la barre de progression). */
+  totalSec: number;
+}
+
+/** Pas de charge proposés pour les boutons − et +, en kg. */
+export const WEIGHT_STEPS = [0.5, 1, 1.25, 2, 2.5, 5, 10];
 
 export const DEFAULT_SETTINGS: Settings = {
   weightStep: 2.5,
@@ -27,6 +41,8 @@ export const DEFAULT_SETTINGS: Settings = {
   firstLaunchAt: null,
   lastBackupAt: null,
   backupSnoozedUntil: null,
+  restTimer: null,
+  skippedDay: null,
 };
 
 export async function getSettings(database: AppDB = db): Promise<Settings> {
