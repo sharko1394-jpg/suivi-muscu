@@ -1,14 +1,16 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router';
+import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import {
   RECORD_LABELS,
+  deleteSession,
   getSessionSummary,
   isCountedSet,
   setSessionNote,
   useLive,
   type SessionSummary,
 } from '../data';
-import { Card, PageHeader, Section, buttonClass } from '../ui/components';
+import { Card, ConfirmDialog, PageHeader, Section, buttonClass } from '../ui/components';
+import { HeaderButton } from '../ui/controls';
 import {
   formatDuration,
   formatLifts,
@@ -16,8 +18,13 @@ import {
   formatLongDay,
   formatShortDate,
   formatVolume,
+  messageOf,
   plural,
 } from '../ui/format';
+import { ActionSheet } from '../ui/overlays';
+import { useToast } from '../ui/toast';
+
+export const editPath = (sessionId: string) => `/bilan/${sessionId}/corriger`;
 
 /** Bilan d'une séance terminée : durée, volume, records, comparaison avec la fois précédente. */
 export function SummaryPage() {
@@ -41,15 +48,60 @@ export function SummaryPage() {
 
 function SummaryView({ summary }: { summary: SessionSummary }) {
   const { session, totals, records, previous, exercises } = summary;
+  const navigate = useNavigate();
+  const location = useLocation();
+  const toast = useToast();
   const [note, setNote] = useState(session.note);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  // Retour à la page d'où l'on vient (accueil ou historique).
+  const leave = () => (location.key === 'default' ? navigate('/', { replace: true }) : navigate(-1));
+
+  const remove = () => {
+    deleteSession(session.id).then(
+      () => {
+        toast('Séance supprimée');
+        navigate('/historique', { replace: true });
+      },
+      (error) => toast(messageOf(error), 'error'),
+    );
+  };
 
   return (
     <>
       <PageHeader
         title={session.workoutName}
         subtitle={`${formatLongDay(session.startedAt)}${session.programName ? ` · ${session.programName}` : ''}`}
-        backTo="/"
+        onBack={leave}
+        action={<HeaderButton label="Actions sur la séance" onClick={() => setMenuOpen(true)} />}
       />
+
+      <ActionSheet
+        open={menuOpen}
+        title={session.workoutName}
+        actions={[
+          { label: 'Corriger la séance', onSelect: () => navigate(editPath(session.id)) },
+          { label: 'Supprimer la séance', danger: true, onSelect: () => setConfirmDelete(true) },
+        ]}
+        onClose={() => setMenuOpen(false)}
+      />
+
+      <ConfirmDialog
+        open={confirmDelete}
+        title="Supprimer cette séance ?"
+        confirmLabel="Supprimer définitivement"
+        danger
+        onCancel={() => setConfirmDelete(false)}
+        onConfirm={remove}
+      >
+        <p>
+          La séance «&nbsp;{session.workoutName}&nbsp;» du {formatShortDate(session.date)} et ses{' '}
+          {plural(exercises.reduce((n, e) => n + e.sets.length, 0), 'série')} seront effacées. Les
+          records qu’elle contenait ne compteront plus.
+        </p>
+        <p>Cette action est définitive. Ton programme n’est pas modifié.</p>
+      </ConfirmDialog>
 
       <div className="space-y-8 p-4 pb-8">
         <div className="grid grid-cols-3 gap-2">
@@ -138,6 +190,9 @@ function SummaryView({ summary }: { summary: SessionSummary }) {
                       .filter(Boolean)
                       .join(' · ')}
                   </p>
+                  {exercise.note !== '' && (
+                    <p className="mt-1 text-sm text-ink/85">Note : {exercise.note}</p>
+                  )}
                 </li>
               );
             })}
@@ -159,6 +214,9 @@ function SummaryView({ summary }: { summary: SessionSummary }) {
           />
         </Section>
 
+        <Link to={editPath(session.id)} className={buttonClass('secondary')}>
+          Corriger la séance
+        </Link>
         <Link to="/" className={buttonClass('primary')}>
           Retour à l’accueil
         </Link>

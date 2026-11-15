@@ -65,7 +65,8 @@ Les données de l'utilisateur sont attachées à cette adresse.
    l'accueil affiche la séance prévue, sans bouton Démarrer)
 3. Accueil et mode séance : fait (démarrer, saisir, minuteur de repos, records en direct, bilan ;
    réglages de séance ; pas de charge par exercice)
-4. Historique : à faire
+4. Historique : fait (liste par mois, calendrier, recherche par exercice ; le bilan sert de page
+   de détail ; correction des séries, des notes et du jour ; suppression avec confirmation)
 5. Statistiques : à faire
 6. Finitions PWA et README en français : à faire
 

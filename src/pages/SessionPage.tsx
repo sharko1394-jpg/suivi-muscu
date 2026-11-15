@@ -775,7 +775,7 @@ function SetEditor({
 }
 
 /** Gros boutons − et + ; toucher la valeur permet de la taper au clavier. */
-function BigStepper({
+export function BigStepper({
   label,
   unit,
   value,

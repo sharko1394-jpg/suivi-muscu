@@ -794,6 +794,7 @@ export interface SessionSummary {
   exercises: {
     id: ID;
     name: string;
+    note: string;
     sets: SetEntry[];
     volume: number;
     /** Volume du même exercice lors de la séance précédente comparable, s'il y était. */
@@ -804,7 +805,7 @@ export interface SessionSummary {
   previous: { session: Session; totals: SessionTotals } | null;
 }
 
-function totalsOf(session: Session, sets: SetEntry[]): SessionTotals {
+export function totalsOf(session: Session, sets: SetEntry[]): SessionTotals {
   return {
     durationSec: Math.max(0, Math.round(((session.endedAt ?? session.startedAt) - session.startedAt) / 1000)),
     volume: totalVolume(sets),
@@ -843,6 +844,7 @@ export async function getSessionSummary(
     exercises: data.exercises.map((e) => ({
       id: e.exercise.id,
       name: e.exercise.exerciseName,
+      note: e.exercise.note,
       sets: e.sets,
       volume: totalVolume(e.sets),
       previousVolume: previousVolumes.get(e.exercise.exerciseId) ?? null,

@@ -13,6 +13,25 @@ const shortDay = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'shor
 /** Jour 'AAAA-MM-JJ' → « 12 nov. » */
 export const formatShortDate = (date: string) => shortDay.format(new Date(`${date}T12:00:00`));
 
+const weekDay = new Intl.DateTimeFormat('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
+const weekDayYear = new Intl.DateTimeFormat('fr-FR', {
+  weekday: 'short',
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+});
+const monthYear = new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric' });
+
+/** Jour 'AAAA-MM-JJ' → « dim. 15 nov. » (avec l'année si ce n'est pas l'année en cours). */
+export function formatDay(date: string): string {
+  const d = new Date(`${date}T12:00:00`);
+  return (d.getFullYear() === new Date().getFullYear() ? weekDay : weekDayYear).format(d);
+}
+
+/** « novembre 2026 » */
+export const formatMonth = (year: number, monthIndex: number) =>
+  monthYear.format(new Date(year, monthIndex, 1, 12));
+
 /** Chronomètre : « 4:07 », « 1:02:15 ». */
 export function formatClock(totalSeconds: number): string {
   const s = Math.max(0, Math.floor(totalSeconds));

@@ -3,7 +3,9 @@ import { Navigate, Route, Routes, useNavigate } from 'react-router';
 import { getActiveSession, initData } from './data';
 import { ExerciseFormPage } from './pages/ExerciseFormPage';
 import { ExercisesPage } from './pages/ExercisesPage';
-import { HistoryPage, StatsPage } from './pages/placeholders';
+import { EditSessionPage } from './pages/EditSessionPage';
+import { HistoryPage } from './pages/HistoryPage';
+import { StatsPage } from './pages/placeholders';
 import { ProgramHome, ProgramListPage } from './pages/ProgramListPage';
 import { ProgramPage } from './pages/ProgramPage';
 import { SESSION_PATH, SessionPage } from './pages/SessionPage';
@@ -50,6 +52,7 @@ export default function App() {
         <Route element={<AppShell />}>
           <Route index element={<TodayPage />} />
           <Route path="bilan/:sessionId" element={<SummaryPage />} />
+          <Route path="bilan/:sessionId/corriger" element={<EditSessionPage />} />
           <Route path="programme" element={<ProgramHome />} />
           <Route path="programme/tous" element={<ProgramListPage />} />
           <Route path="programme/p/:programId" element={<ProgramPage />} />

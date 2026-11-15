@@ -16,6 +16,7 @@ export * from './programs';
 export * from './calc';
 export * from './sessionFlow';
 export * from './sessions';
+export * from './history';
 export * from './settings';
 export * from './backup';
 export * from './storage';

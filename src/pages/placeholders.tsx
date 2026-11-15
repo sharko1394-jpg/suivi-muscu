@@ -1,17 +1,6 @@
 import { ComingSoon, PageHeader } from '../ui/components';
 
-// Pages provisoires, remplacées au fil des étapes de construction.
-
-export function HistoryPage() {
-  return (
-    <>
-      <PageHeader title="Historique" />
-      <ComingSoon step={4}>
-        Ici, tu retrouveras toutes tes séances passées, en calendrier ou en liste.
-      </ComingSoon>
-    </>
-  );
-}
+// Page provisoire, remplacée à l'étape 5.
 
 export function StatsPage() {
   return (
