@@ -1,11 +1,14 @@
-import { useCallback, useEffect, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useState } from 'react';
 import { Navigate, Route, Routes, useNavigate } from 'react-router';
 import { getActiveSession, initData } from './data';
 import { ExerciseFormPage } from './pages/ExerciseFormPage';
 import { ExercisesPage } from './pages/ExercisesPage';
 import { EditSessionPage } from './pages/EditSessionPage';
 import { HistoryPage } from './pages/HistoryPage';
-import { StatsPage } from './pages/placeholders';
+
+// Les graphiques sont lourds : ils ne sont chargés qu'à l'ouverture de l'onglet Stats
+// (et restent disponibles hors ligne, comme le reste).
+const StatsPage = lazy(() => import('./pages/StatsPage'));
 import { ProgramHome, ProgramListPage } from './pages/ProgramListPage';
 import { ProgramPage } from './pages/ProgramPage';
 import { SESSION_PATH, SessionPage } from './pages/SessionPage';
@@ -58,7 +61,14 @@ export default function App() {
           <Route path="programme/p/:programId" element={<ProgramPage />} />
           <Route path="programme/p/:programId/s/:workoutId" element={<WorkoutPage />} />
           <Route path="historique" element={<HistoryPage />} />
-          <Route path="stats" element={<StatsPage />} />
+          <Route
+            path="stats"
+            element={
+              <Suspense fallback={null}>
+                <StatsPage />
+              </Suspense>
+            }
+          />
           <Route path="reglages" element={<SettingsPage />} />
           <Route path="reglages/exercices" element={<ExercisesPage />} />
           <Route path="reglages/exercices/nouveau" element={<ExerciseFormPage />} />

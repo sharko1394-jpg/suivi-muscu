@@ -67,7 +67,9 @@ Les données de l'utilisateur sont attachées à cette adresse.
    réglages de séance ; pas de charge par exercice)
 4. Historique : fait (liste par mois, calendrier, recherche par exercice ; le bilan sert de page
    de détail ; correction des séries, des notes et du jour ; suppression avec confirmation)
-5. Statistiques : à faire
+5. Statistiques : fait (courbes par exercice avec filtre de période, tableau des records,
+   assiduité, séries par muscle principal et par semaine, poids de corps ; graphiques Recharts
+   chargés seulement à l'ouverture de l'onglet)
 6. Finitions PWA et README en français : à faire
 
 ## Commandes
