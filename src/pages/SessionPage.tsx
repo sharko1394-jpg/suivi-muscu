@@ -242,7 +242,7 @@ function SessionScreen({
 
   return (
     <div className="mx-auto flex h-dvh max-w-xl flex-col">
-      <header className="flex items-center gap-2 bg-black/40 px-4 pb-3 backdrop-blur-xl pt-[calc(env(safe-area-inset-top)+0.75rem)]">
+      <header className="flex items-center gap-2 bg-bg/80 px-4 pb-3 backdrop-blur-xl pt-[calc(env(safe-area-inset-top)+0.75rem)]">
         <Link
           to="/"
           aria-label="Revenir à l’accueil (la séance continue)"
@@ -783,7 +783,7 @@ export function BigStepper({
   const [draft, setDraft] = useState<string | null>(null);
   const round = (n: number) => Math.round(n * 100) / 100;
   const button =
-    'flex h-16 w-18 shrink-0 items-center justify-center rounded-2xl border border-line bg-raised text-ink select-none active:bg-line disabled:opacity-35';
+    'flex size-16 shrink-0 items-center justify-center rounded-full border border-line bg-raised text-ink select-none active:bg-line disabled:opacity-35';
 
   const commit = () => {
     if (draft === null) return;

@@ -14,7 +14,7 @@ const VARIANTS: Record<Variant, string> = {
 };
 
 export const buttonClass = (variant: Variant = 'secondary') =>
-  `flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl px-5 text-center text-lg font-semibold transition select-none disabled:opacity-40 ${VARIANTS[variant]}`;
+  `flex min-h-14 w-full items-center justify-center gap-2 rounded-full px-6 text-center text-lg font-semibold transition select-none disabled:opacity-40 ${VARIANTS[variant]}`;
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
@@ -44,7 +44,7 @@ export function PageHeader({
   const backClass =
     '-ml-3 flex size-12 shrink-0 items-center justify-center rounded-full active:bg-raised';
   return (
-    <header className="sticky top-0 z-10 flex items-center gap-1 bg-black/40 px-4 pb-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] backdrop-blur-xl">
+    <header className="sticky top-0 z-10 flex items-center gap-1 bg-bg/80 px-4 pb-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] backdrop-blur-xl">
       {onBack ? (
         <button type="button" onClick={onBack} aria-label="Retour" className={backClass}>
           <IconChevronLeft />

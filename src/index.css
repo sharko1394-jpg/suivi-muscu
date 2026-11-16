@@ -1,18 +1,21 @@
 @import "tailwindcss";
 
-/* Thème : fond noir, rouge dominant, surfaces en verre translucide. */
+/*
+ * Thème : gris anthracite très sombre, cartes gris foncé aux coins bien ronds,
+ * boutons en pilule, rouge pour les actions principales, barre d'onglets en verre dépoli.
+ */
 @theme {
-  --color-bg: #000000;
-  --color-surface: rgb(255 255 255 / 0.07);
-  --color-raised: rgb(255 255 255 / 0.12);
-  --color-line: rgb(255 255 255 / 0.16);
-  --color-ink: #ffffff;
-  --color-muted: rgb(235 235 245 / 0.62);
+  --color-bg: #121213;
+  --color-surface: #1e1e20;
+  --color-raised: #2c2c2f;
+  --color-line: rgb(255 255 255 / 0.09);
+  --color-ink: #f5f5f7;
+  --color-muted: #9a9aa2;
   --color-accent: #ff453a;
   --color-accent-ink: #ffffff;
   --color-danger: #ff8a80;
   --color-gold: #ffd60a;
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-sans: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
 @layer base {
@@ -25,18 +28,14 @@
   html {
     color-scheme: dark;
     -webkit-text-size-adjust: 100%;
-    background: #000;
+    background: var(--color-bg);
   }
 
   body {
-    /* Lueurs rouges derrière le contenu : c'est ce que le verre laisse deviner. */
-    background:
-      radial-gradient(60rem 28rem at 85% -8%, rgb(255 69 58 / 0.34), transparent 60%),
-      radial-gradient(44rem 26rem at -10% 105%, rgb(255 45 85 / 0.24), transparent 60%),
-      #000;
-    background-attachment: fixed;
+    background: var(--color-bg);
     color: var(--color-ink);
     font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
     -webkit-tap-highlight-color: transparent;
     overscroll-behavior: none;
     /* Pas de zoom au double tap : les boutons répondent tout de suite. */
@@ -50,10 +49,9 @@
     font-size: 16px;
   }
 
-  /* Les listes déroulantes s'ouvrent sur un fond opaque, lisible. */
   option {
-    background: #1c1c1e;
-    color: #fff;
+    background: #1e1e20;
+    color: #f5f5f7;
   }
 
   button,
@@ -68,15 +66,13 @@
   }
 }
 
-/* Verre : panneau translucide qui floute ce qui passe derrière (barre d'onglets, fenêtres, menus). */
+/* Verre dépoli : barre d'onglets, fenêtres, menus. Laisse deviner ce qui défile derrière. */
 @utility glass {
-  background: rgb(30 30 32 / 0.62);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
-  backdrop-filter: blur(28px) saturate(180%);
-  border: 1px solid rgb(255 255 255 / 0.14);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.12),
-    0 12px 40px rgb(0 0 0 / 0.5);
+  background: rgb(58 58 62 / 0.62);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgb(255 255 255 / 0.1);
+  box-shadow: 0 10px 34px rgb(0 0 0 / 0.45);
 }
 
 @utility no-scrollbar {

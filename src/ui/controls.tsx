@@ -3,7 +3,7 @@ import { formatNumber } from './format';
 import { IconMinus, IconMore, IconPlus } from './icons';
 
 const roundButton =
-  'flex size-13 shrink-0 items-center justify-center rounded-2xl border border-line bg-raised text-ink select-none active:bg-line disabled:opacity-35';
+  'flex size-13 shrink-0 items-center justify-center rounded-full border border-line bg-raised text-ink select-none active:bg-line disabled:opacity-35';
 
 // ---------- Boutons − / + ----------
 

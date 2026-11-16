@@ -46,26 +46,32 @@ function BottomNav() {
   return (
     <nav
       aria-label="Navigation principale"
-      className="glass pointer-events-auto grid grid-cols-5 rounded-[2rem] p-1.5"
+      className="glass pointer-events-auto mx-auto flex w-fit max-w-full items-center gap-1 rounded-full p-1.5"
     >
+      {/* L'onglet ouvert s'étire en pilule rouge avec son nom ; les autres ne montrent que leur icône. */}
       {TABS.map(({ to, label, icon: TabIcon }) => (
         <NavLink
           key={to}
           to={to}
           end={to === '/'}
+          aria-label={label}
           className={({ isActive }) =>
-            `relative flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-[1.6rem] text-[0.68rem] font-semibold select-none ${
-              isActive ? 'bg-white/12 text-accent' : 'text-muted active:text-ink'
+            `relative flex h-13 items-center justify-center gap-2 rounded-full text-sm font-semibold select-none transition-[background-color] ${
+              isActive ? 'bg-accent px-4 text-accent-ink' : 'w-13 text-muted active:text-ink'
             }`
           }
         >
-          <TabIcon />
-          <span>{label}</span>
-          {to === '/reglages' && backupDue && (
-            <span
-              className="absolute right-[calc(50%-1.1rem)] top-2 size-2.5 rounded-full bg-gold"
-              aria-label="Sauvegarde conseillée"
-            />
+          {({ isActive }) => (
+            <>
+              <TabIcon className="shrink-0" />
+              {isActive && <span>{label}</span>}
+              {to === '/reglages' && backupDue && (
+                <span
+                  className="absolute right-2 top-2 size-2.5 rounded-full bg-gold"
+                  aria-label="Sauvegarde conseillée"
+                />
+              )}
+            </>
           )}
         </NavLink>
       ))}

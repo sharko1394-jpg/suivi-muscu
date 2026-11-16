@@ -60,8 +60,10 @@ Les données de l'utilisateur sont attachées à cette adresse.
 
 ## Apparence
 
-- Thème voulu par l'utilisateur : fond noir, rouge dominant (`--color-accent`), surfaces en verre
-  translucide (classe `glass` dans `src/index.css`), barre d'onglets flottante.
+- Thème voulu par l'utilisateur (d'après une maquette qu'il a fournie) : gris anthracite très sombre,
+  cartes gris foncé aux coins ronds, boutons en pilule, police Poppins (embarquée), rouge
+  (`--color-accent`) pour les actions principales, barre d'onglets flottante en verre dépoli
+  (classe `glass`) où seul l'onglet ouvert affiche son nom.
 - Mise en page minimaliste : pas de texte d'explication dans les écrans. Garder seulement les
   messages d'état, d'erreur et de confirmation.
 - Types de série : normale, échauffement, drop set, superset, bi-set, échec. Superset et bi-set
