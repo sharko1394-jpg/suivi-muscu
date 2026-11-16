@@ -242,7 +242,7 @@ function SessionScreen({
 
   return (
     <div className="mx-auto flex h-dvh max-w-xl flex-col">
-      <header className="flex items-center gap-2 bg-bg/80 px-4 pb-3 backdrop-blur-xl pt-[calc(env(safe-area-inset-top)+0.75rem)]">
+      <header className="flex items-center gap-2 bg-bg/30 px-4 pb-3 backdrop-blur-xl pt-[calc(env(safe-area-inset-top)+0.75rem)]">
         <Link
           to="/"
           aria-label="Revenir à l’accueil (la séance continue)"

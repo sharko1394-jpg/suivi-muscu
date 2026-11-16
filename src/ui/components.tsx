@@ -44,7 +44,7 @@ export function PageHeader({
   const backClass =
     '-ml-3 flex size-12 shrink-0 items-center justify-center rounded-full active:bg-raised';
   return (
-    <header className="sticky top-0 z-10 flex items-center gap-1 bg-bg/80 px-4 pb-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] backdrop-blur-xl">
+    <header className="sticky top-0 z-10 flex items-center gap-1 bg-bg/30 px-4 pb-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] backdrop-blur-xl">
       {onBack ? (
         <button type="button" onClick={onBack} aria-label="Retour" className={backClass}>
           <IconChevronLeft />
@@ -148,7 +148,7 @@ export function ConfirmDialog({
   if (!open) return null;
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/75 p-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)]"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm p-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)]"
       role="dialog"
       aria-modal="true"
       aria-labelledby="dialog-title"

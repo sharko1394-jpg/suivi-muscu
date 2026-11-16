@@ -64,6 +64,11 @@ Les données de l'utilisateur sont attachées à cette adresse.
   cartes gris foncé aux coins ronds, boutons en pilule, police Poppins (embarquée), rouge
   (`--color-accent`) pour les actions principales, barre d'onglets flottante en verre dépoli
   (classe `glass`) où seul l'onglet ouvert affiche son nom.
+- Fond animé en permanence (`src/ui/LiquidBackground.tsx`, WebGL) : liquide irisé bleu, violet,
+  cyan et rose, formes floues, aurore, reflets. Monté une seule fois dans `main.tsx`, hors des
+  pages, pour ne jamais se réinitialiser. Calculé à 45 % de la résolution, 30 images/s sur
+  téléphone, arrêté quand l'appli est en arrière-plan, image fixe si « réduire les animations »,
+  secours en CSS si WebGL manque. Cartes et en-têtes translucides pour le laisser voir.
 - Mise en page minimaliste : pas de texte d'explication dans les écrans. Garder seulement les
   messages d'état, d'erreur et de confirmation.
 - Types de série : normale, échauffement, drop set, superset, bi-set, échec. Superset et bi-set

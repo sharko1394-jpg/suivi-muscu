@@ -168,7 +168,7 @@ export function ExercisePicker({
   if (!open) return null;
   return (
     <div
-      className="fixed inset-0 z-40 mx-auto flex max-w-xl flex-col bg-black"
+      className="fixed inset-0 z-40 mx-auto flex max-w-xl flex-col bg-black/55 backdrop-blur-2xl"
       role="dialog"
       aria-modal="true"
       aria-label={title}

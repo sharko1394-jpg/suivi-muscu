@@ -19,7 +19,7 @@ export function Sheet({
   if (!open) return null;
   return (
     <div
-      className="fixed inset-0 z-40 flex items-end justify-center bg-black/75"
+      className="fixed inset-0 z-40 flex items-end justify-center bg-black/50 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-label={title}
@@ -70,7 +70,7 @@ export function ActionSheet({
   if (!open) return null;
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/75 p-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)]"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm p-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)]"
       role="dialog"
       aria-modal="true"
       aria-label={title}
@@ -147,7 +147,7 @@ function PromptForm({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center bg-black/75 p-3 pt-[calc(env(safe-area-inset-top)+3.5rem)]"
+      className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 backdrop-blur-sm p-3 pt-[calc(env(safe-area-inset-top)+3.5rem)]"
       role="dialog"
       aria-modal="true"
       aria-labelledby="prompt-title"

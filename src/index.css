@@ -2,13 +2,15 @@
 
 /*
  * Thème : gris anthracite très sombre, cartes gris foncé aux coins bien ronds,
- * boutons en pilule, rouge pour les actions principales, barre d'onglets en verre dépoli.
+ * boutons en pilule, rouge pour les actions principales, panneaux en verre dépoli
+ * posés sur un fond liquide animé en permanence (src/ui/LiquidBackground.tsx).
  */
 @theme {
   --color-bg: #121213;
-  --color-surface: #1e1e20;
-  --color-raised: #2c2c2f;
-  --color-line: rgb(255 255 255 / 0.09);
+  /* Surfaces translucides : le fond animé reste visible à travers. */
+  --color-surface: rgb(24 24 30 / 0.46);
+  --color-raised: rgb(255 255 255 / 0.1);
+  --color-line: rgb(255 255 255 / 0.11);
   --color-ink: #f5f5f7;
   --color-muted: #9a9aa2;
   --color-accent: #ff453a;
@@ -25,6 +27,12 @@
     height: 100%;
   }
 
+  /* Le contenu passe au-dessus du fond animé. */
+  #root {
+    position: relative;
+    z-index: 1;
+  }
+
   html {
     color-scheme: dark;
     -webkit-text-size-adjust: 100%;
@@ -32,7 +40,7 @@
   }
 
   body {
-    background: var(--color-bg);
+    background: transparent;
     color: var(--color-ink);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
@@ -66,13 +74,54 @@
   }
 }
 
-/* Verre dépoli : barre d'onglets, fenêtres, menus. Laisse deviner ce qui défile derrière. */
+/* Verre dépoli : barre d'onglets, fenêtres, menus. Laisse voir le fond animé, flouté. */
 @utility glass {
-  background: rgb(58 58 62 / 0.62);
-  -webkit-backdrop-filter: blur(24px) saturate(160%);
-  backdrop-filter: blur(24px) saturate(160%);
-  border: 1px solid rgb(255 255 255 / 0.1);
-  box-shadow: 0 10px 34px rgb(0 0 0 / 0.45);
+  background: rgb(40 40 48 / 0.5);
+  -webkit-backdrop-filter: blur(26px) saturate(170%);
+  backdrop-filter: blur(26px) saturate(170%);
+  border: 1px solid rgb(255 255 255 / 0.14);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.14),
+    0 10px 34px rgb(0 0 0 / 0.4);
+}
+
+/* Les cartes sont aussi en verre : le flou laisse distinguer les mouvements et les couleurs derrière. */
+.bg-surface {
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(20px) saturate(160%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08);
+}
+
+/*
+ * Secours si la carte graphique n'est pas disponible : formes floues animées en CSS.
+ * Durées différentes et non multiples entre elles, pour que l'ensemble ne se répète jamais à l'identique.
+ */
+.ambient-fallback {
+  position: absolute;
+  inset: -20%;
+  background: #0b0b10;
+  filter: blur(60px) saturate(140%);
+}
+.ambient-fallback span {
+  position: absolute;
+  width: 60vmax;
+  height: 60vmax;
+  border-radius: 45% 55% 60% 40%;
+  opacity: 0.55;
+  animation: ambient-drift 47s ease-in-out infinite alternate;
+}
+.ambient-fallback span:nth-child(1) { left: 0%; top: 0%; background: #1a38d9; }
+.ambient-fallback span:nth-child(2) { right: 0%; top: 10%; background: #852ee6; animation-duration: 61s; animation-delay: -13s; }
+.ambient-fallback span:nth-child(3) { left: 15%; bottom: 0%; background: #0dc7eb; animation-duration: 53s; animation-delay: -29s; }
+.ambient-fallback span:nth-child(4) { right: 10%; bottom: 5%; background: #fa4dad; animation-duration: 71s; animation-delay: -41s; }
+@keyframes ambient-drift {
+  0%   { transform: translate(0, 0) scale(1) rotate(0deg); border-radius: 45% 55% 60% 40%; }
+  33%  { transform: translate(12vmax, 8vmax) scale(1.15) rotate(60deg); border-radius: 60% 40% 45% 55%; }
+  66%  { transform: translate(-6vmax, 14vmax) scale(0.85) rotate(130deg); border-radius: 40% 60% 55% 45%; }
+  100% { transform: translate(8vmax, -6vmax) scale(1.1) rotate(200deg); border-radius: 55% 45% 40% 60%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ambient-fallback span { animation: none; }
 }
 
 @utility no-scrollbar {
