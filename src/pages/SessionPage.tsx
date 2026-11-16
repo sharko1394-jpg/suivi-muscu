@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router';
 import {
   RECORD_LABELS,
@@ -52,6 +52,7 @@ import {
 import { useNow, useRestAlarm, useWakeLock } from '../ui/hooks';
 import { IconCheck, IconChevronLeft, IconLink, IconMinus, IconPlus } from '../ui/icons';
 import { ActionSheet, type SheetAction } from '../ui/overlays';
+import { ambientRecord, ambientRest } from '../ui/ambient';
 import { unlockAudio } from '../ui/sound';
 import { useToast } from '../ui/toast';
 
@@ -137,6 +138,18 @@ function SessionScreen({
   const [replacement, setReplacement] = useState<{ sessionExerciseId: string; exercise: Exercise } | null>(null);
 
   useWakeLock(true);
+
+  // Fond animé : il respire pendant le repos, et une onde de choc dorée salue chaque nouveau record.
+  const restEndsAt = settings?.restTimer?.endsAt ?? null;
+  useEffect(() => ambientRest(restEndsAt), [restEndsAt]);
+  useEffect(() => () => ambientRest(null), []);
+  const recordCount = (data?.exercises ?? []).reduce((n, e) => n + e.records.size, 0);
+  const knownRecords = useRef<number | null>(null);
+  useEffect(() => {
+    if (!data) return;
+    if (knownRecords.current !== null && recordCount > knownRecords.current) ambientRecord();
+    knownRecords.current = recordCount;
+  }, [data, recordCount]);
   useRestAlarm(
     settings?.restTimer ?? null,
     settings?.soundEnabled ?? false,

@@ -64,11 +64,15 @@ Les données de l'utilisateur sont attachées à cette adresse.
   cartes gris foncé aux coins ronds, boutons en pilule, police Poppins (embarquée), rouge
   (`--color-accent`) pour les actions principales, barre d'onglets flottante en verre dépoli
   (classe `glass`) où seul l'onglet ouvert affiche son nom.
-- Fond animé en permanence (`src/ui/LiquidBackground.tsx`, WebGL) : liquide irisé bleu, violet,
-  cyan et rose, formes floues, aurore, reflets. Monté une seule fois dans `main.tsx`, hors des
-  pages, pour ne jamais se réinitialiser. Calculé à 45 % de la résolution, 30 images/s sur
-  téléphone, arrêté quand l'appli est en arrière-plan, image fixe si « réduire les animations »,
-  secours en CSS si WebGL manque. Cartes et en-têtes translucides pour le laisser voir.
+- Fond animé en permanence (`src/ui/LiquidBackground.tsx`, WebGL), thème « forge liquide » rouge :
+  métal en fusion, formes floues, voiles de chaleur, reflets, braises qui montent. Monté une seule
+  fois dans `main.tsx`, hors des pages, pour ne jamais se réinitialiser. Il réagit : onde sous le
+  doigt à chaque appui, onde de choc dorée à chaque record, ralenti et respiration pendant le repos
+  puis vague rouge à la fin (messages envoyés par `src/ui/ambient.ts`). Calculé à 45 % de la
+  résolution, 30 images/s sur téléphone, arrêté en arrière-plan, image fixe si « réduire les
+  animations », secours en CSS sans WebGL. Cartes et en-têtes translucides pour le laisser voir.
+- Rouge : `--color-accent` (#b5121b, sombre) pour les fonds ; `--color-accent-bright` pour le
+  texte rouge (la classe `text-accent` l'utilise), lisible sur fond sombre.
 - Mise en page minimaliste : pas de texte d'explication dans les écrans. Garder seulement les
   messages d'état, d'erreur et de confirmation.
 - Types de série : normale, échauffement, drop set, superset, bi-set, échec. Superset et bi-set

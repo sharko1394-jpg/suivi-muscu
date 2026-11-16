@@ -11,7 +11,7 @@ import {
 } from 'recharts';
 
 // Couleurs du thème, reprises de index.css (les graphiques ne lisent pas les classes Tailwind).
-const ACCENT = '#ff453a';
+const ACCENT = '#ff5c52';
 const GRID = 'rgba(255,255,255,0.16)';
 const MUTED = 'rgba(235,235,245,0.62)';
 
