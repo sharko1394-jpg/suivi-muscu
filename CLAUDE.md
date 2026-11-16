@@ -65,7 +65,7 @@ Les données de l'utilisateur sont attachées à cette adresse.
   (`--color-accent`) pour les actions principales, barre d'onglets flottante en verre dépoli
   (classe `glass`) où seul l'onglet ouvert affiche son nom.
 - Fond animé en permanence (`src/ui/LiquidBackground.tsx`, WebGL), thème « forge liquide » rouge :
-  métal en fusion, formes floues, voiles de chaleur, reflets, braises qui montent. Monté une seule
+  métal en fusion, formes floues, voiles de chaleur, reflets. Monté une seule
   fois dans `main.tsx`, hors des pages, pour ne jamais se réinitialiser. Il réagit : onde sous le
   doigt à chaque appui, onde de choc dorée à chaque record, ralenti et respiration pendant le repos
   puis vague rouge à la fin (messages envoyés par `src/ui/ambient.ts`). Calculé à 45 % de la

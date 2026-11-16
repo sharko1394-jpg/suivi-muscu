@@ -13,7 +13,6 @@ import { onAmbient } from './ambient';
  *  3. grandes formes floues qui dérivent, gonflent et dégonflent ;
  *  4. voiles de chaleur, comme une aurore rouge, qui ondulent dans le haut ;
  *  5. reflets de lumière réfractée sur le liquide ;
- *  6. braises qui montent doucement du bas de l'écran.
  *
  * Il réagit aussi à l'appli :
  *  - un appui n'importe où fait naître une onde dans le liquide ;
@@ -83,25 +82,6 @@ float blob(vec2 p, vec2 freq, vec2 phase, float t, float radius) {
   return exp(-d * d / (r * r));
 }
 
-// Braises : trois couches de particules qui montent à des vitesses différentes et scintillent.
-float embers(vec2 p, float t) {
-  float glow = 0.0;
-  for (int i = 0; i < 3; i++) {
-    float fi = float(i);
-    float scale = 5.0 + fi * 3.5;
-    vec2 g = p * scale;
-    g.y -= t * (0.55 + fi * 0.3);
-    g.x += 0.35 * sin(g.y * 0.6 + fi * 2.7 + t * 0.4);
-    vec2 id = floor(g);
-    float h = hash(id + fi * 17.0);
-    vec2 off = vec2(hash(id + 3.1), hash(id + 7.7)) - 0.5;
-    float d = length(fract(g) - 0.5 - off * 0.6);
-    float flicker = 0.55 + 0.45 * sin(t * (3.0 + h * 5.0) + h * 40.0);
-    glow += step(0.78, h) * smoothstep(0.14, 0.0, d) * flicker * (0.9 - fi * 0.22);
-  }
-  return glow * smoothstep(0.75, -0.55, p.y);
-}
-
 void main() {
   vec2 p = (gl_FragCoord.xy - 0.5 * uRes) / min(uRes.x, uRes.y);
   float t = uTime;
@@ -156,9 +136,6 @@ void main() {
   // 5. Reflets réfractés.
   float caustic = pow(abs(sin(f * 17.0 + r.y * 6.0 - t * 0.42)), 18.0);
   col += vec3(1.0, 0.62, 0.45) * caustic * 0.15 * smoothstep(0.35, 0.7, f);
-
-  // 6. Braises.
-  col += vec3(1.0, 0.45, 0.12) * embers(p, now) * 0.85;
 
   // Réactions : ondes des appuis, onde de choc, respiration du repos.
   col += vec3(1.0, 0.4, 0.3) * abs(rings) * 0.45;
