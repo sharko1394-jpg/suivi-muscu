@@ -70,7 +70,10 @@ Les données de l'utilisateur sont attachées à cette adresse.
 5. Statistiques : fait (courbes par exercice avec filtre de période, tableau des records,
    assiduité, séries par muscle principal et par semaine, poids de corps ; graphiques Recharts
    chargés seulement à l'ouverture de l'onglet)
-6. Finitions PWA et README en français : à faire
+6. Finitions PWA et README en français : fait (bouton « Rechercher une mise à jour », README).
+   La première version (1.0.0) est complète. Restent les idées « second temps » du cahier des
+   charges : suggestion de progression, calculateur de disques, échauffements automatiques,
+   mensurations et photos.
 
 ## Commandes
 

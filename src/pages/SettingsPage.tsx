@@ -126,6 +126,30 @@ export function SettingsPage() {
       else toast('Le téléphone n’a pas accordé la protection pour l’instant.', 'error');
     });
 
+  /**
+   * Demande tout de suite s'il existe une version plus récente, sans attendre la vérification
+   * automatique. Si oui, le bandeau « Mise à jour disponible » apparaît. Les données ne sont pas touchées.
+   */
+  const checkForUpdate = () =>
+    run(async () => {
+      const registration = await navigator.serviceWorker?.getRegistration();
+      if (!registration) {
+        toast('La recherche de mise à jour n’est possible que sur l’appli en ligne.', 'error');
+        return;
+      }
+      try {
+        await registration.update();
+      } catch {
+        toast('Impossible de vérifier : pas de réseau pour l’instant.', 'error');
+        return;
+      }
+      if (registration.installing || registration.waiting) {
+        toast('Mise à jour trouvée : le bandeau va apparaître en bas de l’écran.');
+      } else {
+        toast('Tu as déjà la dernière version.');
+      }
+    });
+
   /** Passe au pas de charge précédent ou suivant dans la liste proposée. */
   const stepWeight = (direction: 1 | -1) => {
     if (!settings) return;
@@ -298,6 +322,9 @@ export function SettingsPage() {
               value={`${__APP_VERSION__} · ${formatDateTime(Date.parse(__BUILD_TIME__))}`}
             />
             <Info label="Format des données" value={`Version ${CURRENT_VERSION}`} />
+            <Button onClick={checkForUpdate} disabled={busy}>
+              Rechercher une mise à jour
+            </Button>
             <p className="text-sm text-muted">
               Aucun compte, aucun serveur : tes données ne quittent jamais ce téléphone, sauf dans
               les fichiers que tu exportes toi-même.

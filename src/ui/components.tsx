@@ -121,19 +121,6 @@ export function Chip({
   );
 }
 
-/** Écran provisoire pour une partie de l'appli pas encore construite. */
-export function ComingSoon({ step, children }: { step: number; children: ReactNode }) {
-  return (
-    <div className="p-4">
-      <Card className="space-y-2 text-center">
-        <p className="text-sm font-semibold uppercase tracking-wider text-accent">
-          Arrive à l’étape {step} sur 6
-        </p>
-        <p className="text-muted">{children}</p>
-      </Card>
-    </div>
-  );
-}
 
 // ---------- Fenêtre de confirmation ----------
 
