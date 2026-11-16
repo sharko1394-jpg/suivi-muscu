@@ -48,6 +48,33 @@ export const IconStats = (p: IconProps) => (
   </Icon>
 );
 
+/** Ampoule : l'onglet Conseils. */
+export const IconCoach = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M9 18h6M10 21h4" />
+    <path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V16h5.2v-.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z" />
+  </Icon>
+);
+
+/** Flèche vers le haut, vers le bas, ou à plat (conseils de charge). */
+export const IconTrendUp = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M12 19V5M6 11l6-6 6 6" />
+  </Icon>
+);
+
+export const IconTrendDown = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M12 5v14M6 13l6 6 6-6" />
+  </Icon>
+);
+
+export const IconTrendFlat = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M5 12h14M13 6l6 6-6 6" />
+  </Icon>
+);
+
 export const IconSettings = (p: IconProps) => (
   <Icon {...p}>
     <path d="M4 6h8M18 6h2M4 12h2M12 12h8M4 18h10M20 18h0" />

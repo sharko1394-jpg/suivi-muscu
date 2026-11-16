@@ -58,6 +58,21 @@ Les données de l'utilisateur sont attachées à cette adresse.
 - Superset : le repos démarre après le dernier exercice du groupe.
 - iPhone : pas de vibration possible ; le minuteur ne sonne que si l'appli est à l'écran.
 
+## Conseils (onglet Conseils, `src/data/coach.ts`)
+
+- Objectif réglable (Force 3–6 rép., 6–12 séries/sem. ; Muscle 8–12, 10–20 ; Endurance 15–20, 8–16),
+  stocké dans le réglage `goal`. La fourchette d'un exercice vient du programme actif s'il y est,
+  sinon de l'objectif.
+- Charges (double progression) sur la charge la plus lourde de la dernière séance, séries de travail
+  seulement (ni échauffement ni drop set) : « Monte » si toutes au plafond (ou la moitié et RPE ≤ 7),
+  « Baisse » si nettement sous la fourchette deux fois de suite (retour à la dernière charge réussie,
+  sinon −10 %), « Stagne » si aucun progrès depuis 3 séances, sinon « Bientôt » ou « Garde ».
+- Volume : séries par muscle et par semaine sur 4 semaines (secondaire = ½ série), comparées à
+  l'objectif ; alertes d'équilibre poussée/tirage, haut/bas, quadriceps/ischios.
+- Records à venir : record à portée d'après le 1RM estimé récent (dans la fourchette travaillée,
+  ± 2 rép.), et projection du 1RM estimé sur 8 semaines jusqu'au prochain palier de 5 kg.
+- Six onglets : sur un écran de moins de 420 px, l'onglet ouvert n'affiche que son icône.
+
 ## Apparence
 
 - Thème voulu par l'utilisateur (d'après une maquette qu'il a fournie) : gris anthracite très sombre,
@@ -94,6 +109,8 @@ Les données de l'utilisateur sont attachées à cette adresse.
    La première version (1.0.0) est complète. Restent les idées « second temps » du cahier des
    charges : suggestion de progression, calculateur de disques, échauffements automatiques,
    mensurations et photos.
+
+7. Conseils : fait (version 1.2.0).
 
 ## Commandes
 

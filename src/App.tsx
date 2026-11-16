@@ -9,6 +9,7 @@ import { HistoryPage } from './pages/HistoryPage';
 // Les graphiques sont lourds : ils ne sont chargés qu'à l'ouverture de l'onglet Stats
 // (et restent disponibles hors ligne, comme le reste).
 const StatsPage = lazy(() => import('./pages/StatsPage'));
+const CoachPage = lazy(() => import('./pages/CoachPage'));
 import { ProgramHome, ProgramListPage } from './pages/ProgramListPage';
 import { ProgramPage } from './pages/ProgramPage';
 import { SESSION_PATH, SessionPage } from './pages/SessionPage';
@@ -66,6 +67,14 @@ export default function App() {
             element={
               <Suspense fallback={null}>
                 <StatsPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="conseils"
+            element={
+              <Suspense fallback={null}>
+                <CoachPage />
               </Suspense>
             }
           />

@@ -18,6 +18,7 @@ export * from './sessionFlow';
 export * from './sessions';
 export * from './history';
 export * from './stats';
+export * from './coach';
 export * from './settings';
 export * from './backup';
 export * from './storage';

@@ -1,5 +1,8 @@
 import { db, type AppDB } from './db';
 
+/** Objectif d'entraînement : oriente les conseils (fourchette de répétitions, volume par muscle). */
+export type Goal = 'force' | 'muscle' | 'endurance';
+
 /** Réglages de l'appli. Stockés dans la base (pas dans localStorage). */
 export interface Settings {
   /** Pas des boutons +/− pour la charge, en kg. */
@@ -20,6 +23,8 @@ export interface Settings {
   restTimer: RestTimer | null;
   /** Mode jours fixes : séance du jour que l'utilisateur a choisi de passer. */
   skippedDay: { date: string; workoutId: string } | null;
+  /** Objectif choisi dans l'onglet Conseils. */
+  goal: Goal;
 }
 
 export interface RestTimer {
@@ -43,6 +48,7 @@ export const DEFAULT_SETTINGS: Settings = {
   backupSnoozedUntil: null,
   restTimer: null,
   skippedDay: null,
+  goal: 'muscle',
 };
 
 export async function getSettings(database: AppDB = db): Promise<Settings> {
