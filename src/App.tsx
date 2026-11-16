@@ -44,7 +44,7 @@ export default function App() {
 
   useEffect(start, [start]);
 
-  if (boot.status === 'loading') return <div className="h-dvh bg-bg" aria-busy="true" />;
+  if (boot.status === 'loading') return <div className="h-dvh" aria-busy="true" />;
   if (boot.status === 'error') return <AppErrorScreen error={boot.error} onRetry={start} />;
 
   return (

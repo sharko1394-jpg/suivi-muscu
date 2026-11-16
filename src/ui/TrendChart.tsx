@@ -11,9 +11,9 @@ import {
 } from 'recharts';
 
 // Couleurs du thème, reprises de index.css (les graphiques ne lisent pas les classes Tailwind).
-const ACCENT = '#c6f135';
-const GRID = '#2c3643';
-const MUTED = '#a3aebb';
+const ACCENT = '#ff453a';
+const GRID = 'rgba(255,255,255,0.16)';
+const MUTED = 'rgba(235,235,245,0.62)';
 
 export interface TrendPoint {
   /** Texte sous l'axe (ex. « 12 nov. »). */
@@ -58,7 +58,7 @@ export function TrendChart({
         const point = active ? (payload?.[0]?.payload as TrendPoint | undefined) : undefined;
         if (!point) return null;
         return (
-          <div className="rounded-xl border border-line bg-raised px-3 py-2 text-sm shadow-xl shadow-black/60">
+          <div className="glass rounded-xl px-3 py-2 text-sm">
             <p className="text-muted">{point.label}</p>
             <p className="font-semibold text-ink">{point.detail}</p>
           </div>
@@ -95,8 +95,8 @@ export function TrendChart({
               type="monotone"
               stroke={ACCENT}
               strokeWidth={2}
-              dot={data.length <= 40 ? { r: 4, fill: ACCENT, stroke: '#141920', strokeWidth: 2 } : false}
-              activeDot={{ r: 6, fill: ACCENT, stroke: '#141920', strokeWidth: 2 }}
+              dot={data.length <= 40 ? { r: 4, fill: ACCENT, stroke: '#000000', strokeWidth: 2 } : false}
+              activeDot={{ r: 6, fill: ACCENT, stroke: '#000000', strokeWidth: 2 }}
               isAnimationActive={false}
             />
           </LineChart>

@@ -79,9 +79,9 @@ export function SessionPage() {
     }
   };
 
-  if (loaded === undefined) return <div className="h-dvh bg-bg" aria-busy="true" />;
+  if (loaded === undefined) return <div className="h-dvh" aria-busy="true" />;
   if (loaded.session === null) {
-    return closing ? <div className="h-dvh bg-bg" aria-busy="true" /> : <Navigate to="/" replace />;
+    return closing ? <div className="h-dvh" aria-busy="true" /> : <Navigate to="/" replace />;
   }
 
   const sessionId = loaded.session.id;
@@ -133,7 +133,6 @@ function SessionScreen({
   const [openId, setOpenId] = useState<string | null>(null);
   const [picking, setPicking] = useState<Picking>(null);
   const [menuFor, setMenuFor] = useState<string | null>(null);
-  const [typeFor, setTypeFor] = useState<string | null>(null);
   const [confirm, setConfirm] = useState<'finish' | 'abandon' | { removeExercise: string } | null>(null);
   const [replacement, setReplacement] = useState<{ sessionExerciseId: string; exercise: Exercise } | null>(null);
 
@@ -174,7 +173,7 @@ function SessionScreen({
     else editor.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }, [openExerciseId, activeSetId]);
 
-  if (!data || !settings) return <div className="h-dvh bg-bg" aria-busy="true" />;
+  if (!data || !settings) return <div className="h-dvh" aria-busy="true" />;
 
   const { session, exercises } = data;
   const doneCount = allSets.filter((s) => s.done).length;
@@ -241,15 +240,9 @@ function SessionScreen({
       ]
     : [];
 
-  const typeTarget = allSets.find((s) => s.id === typeFor);
-  const typeMenu: SheetAction[] = (Object.keys(SET_TYPE_LABELS) as SetType[]).map((type) => ({
-    label: SET_TYPE_LABELS[type] + (typeTarget?.type === type ? ' ✓' : ''),
-    onSelect: () => typeTarget && run(() => updateSet(typeTarget.id, { type })),
-  }));
-
   return (
     <div className="mx-auto flex h-dvh max-w-xl flex-col">
-      <header className="flex items-center gap-2 border-b border-line/60 bg-bg px-4 pb-3 pt-[calc(env(safe-area-inset-top)+0.75rem)]">
+      <header className="flex items-center gap-2 bg-black/40 px-4 pb-3 backdrop-blur-xl pt-[calc(env(safe-area-inset-top)+0.75rem)]">
         <Link
           to="/"
           aria-label="Revenir à l’accueil (la séance continue)"
@@ -304,7 +297,6 @@ function SessionScreen({
                 setFocusId(null);
               })
             }
-            onTypeMenu={(set) => setTypeFor(set.id)}
             onMenu={() => setMenuFor(item.exercise.id)}
             onNote={(note) => run(() => setSessionExerciseNote(item.exercise.id, note))}
           />
@@ -346,13 +338,6 @@ function SessionScreen({
         title={menuTarget?.exercise.exerciseName ?? ''}
         actions={exerciseMenu}
         onClose={() => setMenuFor(null)}
-      />
-
-      <ActionSheet
-        open={typeTarget !== undefined}
-        title="Type de série"
-        actions={typeMenu}
-        onClose={() => setTypeFor(null)}
       />
 
       <ActionSheet
@@ -457,7 +442,6 @@ function ExerciseCard({
   onUnvalidate,
   onAddSet,
   onRemoveSet,
-  onTypeMenu,
   onMenu,
   onNote,
 }: {
@@ -473,7 +457,6 @@ function ExerciseCard({
   onUnvalidate: (set: SetEntry) => void;
   onAddSet: () => void;
   onRemoveSet: (set: SetEntry) => void;
-  onTypeMenu: (set: SetEntry) => void;
   onMenu: () => void;
   onNote: (note: string) => void;
 }) {
@@ -524,7 +507,7 @@ function ExerciseCard({
           )}
           {inSuperset && (
             <p className="flex items-center gap-1 text-sm font-semibold text-accent">
-              <IconLink className="size-4" /> Superset : enchaîne avec l’exercice lié, sans repos
+              <IconLink className="size-4" /> Superset
             </p>
           )}
         </div>
@@ -540,7 +523,7 @@ function ExerciseCard({
             <span className="font-semibold">{formatLifts(lastLifts)}</span>
           </>
         ) : (
-          <span className="text-muted">Première fois que tu fais cet exercice.</span>
+          <span className="text-muted">Première fois</span>
         )}
       </p>
 
@@ -571,7 +554,6 @@ function ExerciseCard({
           onValidate={() => onValidate(active)}
           onUnvalidate={() => onUnvalidate(active)}
           onRemove={() => onRemoveSet(active)}
-          onTypeMenu={() => onTypeMenu(active)}
         />
       )}
 
@@ -594,7 +576,9 @@ function ExerciseCard({
 const SHORT_TYPE: Record<SetType, string | null> = {
   normal: null,
   warmup: 'Échauff.',
-  drop: 'Dégressive',
+  drop: 'Drop set',
+  superset: 'Superset',
+  biset: 'Bi-set',
   failure: 'Échec',
 };
 
@@ -665,7 +649,6 @@ function SetEditor({
   onValidate,
   onUnvalidate,
   onRemove,
-  onTypeMenu,
 }: {
   set: SetEntry;
   position: string;
@@ -677,19 +660,22 @@ function SetEditor({
   onValidate: () => void;
   onUnvalidate: () => void;
   onRemove: () => void;
-  onTypeMenu: () => void;
 }) {
   return (
-    <div id={EDITOR_ID} className="scroll-mb-2 space-y-3 rounded-2xl border border-line bg-bg p-3">
-      <div className="flex items-center gap-2">
-        <p className="min-w-0 flex-1 font-semibold">{position}</p>
-        <button
-          type="button"
-          onClick={onTypeMenu}
-          className="min-h-11 shrink-0 rounded-full border border-line bg-raised px-4 text-sm font-semibold active:bg-line"
-        >
-          {SET_TYPE_LABELS[set.type]}
-        </button>
+    <div id={EDITOR_ID} className="scroll-mb-2 space-y-3 rounded-2xl border border-line bg-black/30 p-3">
+      <p className="font-semibold">{position}</p>
+
+      {/* Type de série : un appui suffit pour noter un drop set, un superset ou un bi-set. */}
+      <div
+        className="flex flex-wrap gap-1.5"
+        role="group"
+        aria-label="Type de série"
+      >
+        {(Object.keys(SET_TYPE_LABELS) as SetType[]).map((type) => (
+          <Chip key={type} selected={set.type === type} onClick={() => onChange({ type })}>
+            {SET_TYPE_LABELS[type]}
+          </Chip>
+        ))}
       </div>
 
       <BigStepper
@@ -755,7 +741,7 @@ function SetEditor({
           </Button>
           {set.weight === null && (
             <p className="text-center text-sm text-gold">
-              Indique la charge pour pouvoir valider (0 kg si poids du corps seul).
+              Indique la charge
             </p>
           )}
         </>
@@ -846,7 +832,7 @@ export function BigStepper({
           aria-label={`${label}, en ${unit}`}
           enterKeyHint="done"
           autoComplete="off"
-          className="h-16 min-w-0 flex-1 rounded-2xl border border-accent bg-bg text-center text-3xl font-bold tabular-nums text-ink outline-none"
+          className="h-16 min-w-0 flex-1 rounded-2xl border border-accent bg-black/40 text-center text-3xl font-bold tabular-nums text-ink outline-none"
         />
       )}
 
@@ -890,7 +876,7 @@ function NoteField({
       autoComplete="off"
       autoCapitalize="sentences"
       enterKeyHint="done"
-      className="h-13 w-full rounded-2xl border border-line bg-bg px-4 text-ink outline-none placeholder:text-muted focus:border-accent"
+      className="h-13 w-full rounded-2xl border border-line bg-black/30 px-4 text-ink outline-none placeholder:text-muted focus:border-accent"
     />
   );
 }
@@ -915,7 +901,7 @@ function RestBar({ timer }: { timer: RestTimer | null }) {
       className={`border-t px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] ${
         over
           ? `border-accent bg-accent text-accent-ink ${sinceEnd < 6 ? 'animate-pulse' : ''}`
-          : 'border-line bg-surface'
+          : 'glass border-x-0 border-b-0'
       }`}
     >
       {!over && (

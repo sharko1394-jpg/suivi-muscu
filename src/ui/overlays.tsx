@@ -26,7 +26,7 @@ export function Sheet({
       onClick={onClose}
     >
       <div
-        className="flex max-h-[92dvh] w-full max-w-xl flex-col rounded-t-3xl border border-b-0 border-line bg-surface"
+        className="flex max-h-[92dvh] w-full max-w-xl flex-col glass rounded-t-3xl border-b-0"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-center gap-2 border-b border-line/60 py-2 pl-5 pr-3">
@@ -77,7 +77,7 @@ export function ActionSheet({
       onClick={onClose}
     >
       <div
-        className="grid w-full max-w-md gap-2 rounded-3xl border border-line bg-surface p-4"
+        className="glass grid w-full max-w-md gap-2 rounded-3xl p-4"
         onClick={(event) => event.stopPropagation()}
       >
         <h2 className="truncate px-1 pb-1 text-sm font-semibold uppercase tracking-wider text-muted">
@@ -156,7 +156,7 @@ function PromptForm({
       <form
         onSubmit={submit}
         noValidate
-        className="w-full max-w-md space-y-4 rounded-3xl border border-line bg-surface p-5"
+        className="glass w-full max-w-md space-y-4 rounded-3xl p-5"
         onClick={(event) => event.stopPropagation()}
       >
         <h2 id="prompt-title" className="text-xl font-bold">

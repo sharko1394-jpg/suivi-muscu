@@ -44,7 +44,7 @@ export function PageHeader({
   const backClass =
     '-ml-3 flex size-12 shrink-0 items-center justify-center rounded-full active:bg-raised';
   return (
-    <header className="sticky top-0 z-10 flex items-center gap-1 border-b border-line/60 bg-bg/90 px-4 pb-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] backdrop-blur">
+    <header className="sticky top-0 z-10 flex items-center gap-1 bg-black/40 px-4 pb-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] backdrop-blur-xl">
       {onBack ? (
         <button type="button" onClick={onBack} aria-label="Retour" className={backClass}>
           <IconChevronLeft />
@@ -155,7 +155,7 @@ export function ConfirmDialog({
       onClick={busy ? undefined : onCancel}
     >
       <div
-        className="w-full max-w-md rounded-3xl border border-line bg-surface p-5"
+        className="glass w-full max-w-md rounded-3xl p-5"
         onClick={(event) => event.stopPropagation()}
       >
         <h2 id="dialog-title" className="text-xl font-bold">

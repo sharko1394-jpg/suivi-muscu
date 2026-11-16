@@ -182,12 +182,6 @@ function WorkoutView({ workout, program }: { workout: ProgramWorkout; program: P
           Ajouter un exercice
         </Button>
 
-        {workout.items.length > 0 && (
-          <p className="px-1 text-sm text-muted">
-            Touche un exercice pour régler ses séries. Pour changer l’ordre, fais-le glisser par
-            les trois traits à sa gauche.
-          </p>
-        )}
       </div>
 
       <Sheet open={editing !== null} title={editing ? nameOf(editing) : ''} onClose={() => setEditingId(null)}>
@@ -341,14 +335,13 @@ function ItemEditor({
           autoComplete="off"
           autoCapitalize="sentences"
           enterKeyHint="done"
-          className="h-14 w-full rounded-2xl border border-line bg-bg px-4 text-ink outline-none placeholder:text-muted focus:border-accent"
+          className="h-14 w-full rounded-2xl border border-line bg-black/30 px-4 text-ink outline-none placeholder:text-muted focus:border-accent"
         />
       </label>
 
       {hasNext && (
         <Switch
           label="Superset avec l’exercice suivant"
-          detail="Les deux s’enchaînent sans repos entre eux."
           checked={linkedWithNext}
           onChange={onLink}
         />

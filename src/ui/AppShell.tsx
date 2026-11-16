@@ -12,7 +12,10 @@ const TABS = [
   { to: '/reglages', label: 'Réglages', icon: IconSettings },
 ];
 
-/** Cadre commun à toutes les pages : contenu défilant, bandeau de mise à jour, barre du bas. */
+/**
+ * Cadre commun à toutes les pages.
+ * Le contenu défile sous une barre d'onglets flottante en verre, qui le laisse deviner.
+ */
 export function AppShell() {
   const { pathname } = useLocation();
   const main = useRef<HTMLElement>(null);
@@ -23,12 +26,17 @@ export function AppShell() {
   }, [pathname]);
 
   return (
-    <div className="mx-auto flex h-dvh max-w-xl flex-col">
-      <main ref={main} className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+    <div className="relative mx-auto h-dvh max-w-xl">
+      <main
+        ref={main}
+        className="h-full overflow-y-auto overscroll-contain pb-[calc(env(safe-area-inset-bottom)+5.5rem)]"
+      >
         <Outlet />
       </main>
-      <UpdateBanner />
-      <BottomNav />
+      <div className="pointer-events-none absolute inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+0.5rem)] z-20 space-y-2">
+        <UpdateBanner />
+        <BottomNav />
+      </div>
     </div>
   );
 }
@@ -38,7 +46,7 @@ function BottomNav() {
   return (
     <nav
       aria-label="Navigation principale"
-      className="grid grid-cols-5 border-t border-line bg-surface pb-[env(safe-area-inset-bottom)]"
+      className="glass pointer-events-auto grid grid-cols-5 rounded-[2rem] p-1.5"
     >
       {TABS.map(({ to, label, icon: TabIcon }) => (
         <NavLink
@@ -46,8 +54,8 @@ function BottomNav() {
           to={to}
           end={to === '/'}
           className={({ isActive }) =>
-            `relative flex min-h-16 flex-col items-center justify-center gap-1 text-xs font-semibold select-none ${
-              isActive ? 'text-accent' : 'text-muted active:text-ink'
+            `relative flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-[1.6rem] text-[0.68rem] font-semibold select-none ${
+              isActive ? 'bg-white/12 text-accent' : 'text-muted active:text-ink'
             }`
           }
         >
@@ -55,7 +63,7 @@ function BottomNav() {
           <span>{label}</span>
           {to === '/reglages' && backupDue && (
             <span
-              className="absolute right-[calc(50%-1.1rem)] top-2.5 size-2.5 rounded-full bg-gold"
+              className="absolute right-[calc(50%-1.1rem)] top-2 size-2.5 rounded-full bg-gold"
               aria-label="Sauvegarde conseillée"
             />
           )}
@@ -102,13 +110,16 @@ function UpdateBanner() {
   };
 
   return (
-    <div role="status" className="flex items-center gap-3 bg-accent px-4 py-2 text-accent-ink">
+    <div
+      role="status"
+      className="pointer-events-auto flex items-center gap-3 rounded-[1.6rem] bg-accent py-2 pl-5 pr-2 text-accent-ink shadow-xl shadow-black/50"
+    >
       <p className="flex-1 text-base font-bold">Mise à jour disponible</p>
       <button
         type="button"
         onClick={update}
         disabled={updating}
-        className="min-h-11 rounded-xl bg-accent-ink px-4 text-base font-semibold text-accent disabled:opacity-60"
+        className="min-h-11 rounded-full bg-black/85 px-4 text-base font-semibold text-white disabled:opacity-60"
       >
         {updating ? 'Installation…' : 'Mettre à jour'}
       </button>

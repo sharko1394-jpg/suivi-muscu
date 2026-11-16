@@ -38,9 +38,6 @@ export function HistoryPage() {
         {history !== undefined && history.length === 0 ? (
           <Card>
             <p className="text-lg font-semibold">Aucune séance pour l’instant</p>
-            <p className="text-muted">
-              Tes séances terminées apparaîtront ici, avec tout ce que tu y as fait.
-            </p>
           </Card>
         ) : (
           <>
@@ -228,7 +225,7 @@ function CalendarView({ entries }: { entries: HistoryEntry[] }) {
 
         <p className="text-center text-sm text-muted">
           {selected
-            ? `${formatDay(selected)} · touche à nouveau le jour pour revoir tout le mois`
+            ? formatDay(selected)
             : `${plural(inMonth.length, 'séance')} ce mois-ci`}
         </p>
       </Card>

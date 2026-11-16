@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import pkg from './package.json' with { type: 'json' };
 
-const BACKGROUND = '#0a0c10';
+const BACKGROUND = '#000000';
 
 export default defineConfig({
   // Chemins relatifs : l'appli fonctionne quelle que soit l'adresse d'hébergement.

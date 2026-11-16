@@ -134,7 +134,8 @@ export interface SessionExercise extends Row {
   note: string;
 }
 
-export type SetType = 'warmup' | 'normal' | 'drop' | 'failure';
+/** Les valeurs 'superset' et 'biset' servent à noter la série ; elles ne changent pas le repos. */
+export type SetType = 'warmup' | 'normal' | 'drop' | 'superset' | 'biset' | 'failure';
 
 export interface SetEntry extends Row {
   sessionId: ID;

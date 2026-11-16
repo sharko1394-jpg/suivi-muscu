@@ -114,12 +114,11 @@ function ProgramView({ program, workouts }: { program: Program; workouts: Progra
       <div className="space-y-8 p-4 pb-8">
         {program.status === 'active' && (
           <p className="rounded-2xl border border-accent/50 bg-accent/10 px-4 py-3 font-semibold text-accent">
-            Programme actif : il détermine ta séance du jour.
+            Programme actif
           </p>
         )}
         {program.status === 'inactive' && (
           <Card className="space-y-3">
-            <p className="text-muted">Ce programme n’est pas celui que tu suis en ce moment.</p>
             <Button
               variant="primary"
               onClick={() =>
@@ -135,9 +134,6 @@ function ProgramView({ program, workouts }: { program: Program; workouts: Progra
         )}
         {archived && (
           <Card className="space-y-3">
-            <p className="text-muted">
-              Programme archivé : il est rangé à part et ne sert plus à choisir ta séance du jour.
-            </p>
             <Button onClick={() => run(() => unarchiveProgram(program.id))}>Désarchiver</Button>
           </Card>
         )}
@@ -184,11 +180,6 @@ function ProgramView({ program, workouts }: { program: Program; workouts: Progra
             <IconPlus />
             Ajouter une séance
           </Button>
-          {workouts.length > 1 && (
-            <p className="px-1 text-sm text-muted">
-              Pour changer l’ordre, fais glisser une séance par les trois traits à sa gauche.
-            </p>
-          )}
         </Section>
 
         <Section title="Planification">
@@ -205,10 +196,6 @@ function ProgramView({ program, workouts }: { program: Program; workouts: Progra
 
             {program.scheduleMode === 'rotation' ? (
               <>
-                <p className="text-muted">
-                  Les séances s’enchaînent dans l’ordre de la liste, puis le cycle recommence. Peu
-                  importe le jour : la prochaine séance est toujours la suivante.
-                </p>
                 {workouts.length > 0 && (
                   <label className="block space-y-2">
                     <span className="block font-semibold">Prochaine séance</span>
@@ -228,9 +215,6 @@ function ProgramView({ program, workouts }: { program: Program; workouts: Progra
               </>
             ) : (
               <>
-                <p className="text-muted">
-                  Chaque jour de la semaine a sa séance, ou reste un jour de repos.
-                </p>
                 {workouts.length === 0 ? (
                   <p className="text-muted">Ajoute d’abord une séance pour la placer sur un jour.</p>
                 ) : (

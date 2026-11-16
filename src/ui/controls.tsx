@@ -125,7 +125,7 @@ export function WeightField({
           placeholder="—"
           autoComplete="off"
           enterKeyHint="done"
-          className="h-13 w-full rounded-2xl border border-line bg-bg pl-2 pr-8 text-center text-xl font-bold tabular-nums text-ink outline-none placeholder:text-muted focus:border-accent"
+          className="h-13 w-full rounded-2xl border border-line bg-black/30 pl-2 pr-8 text-center text-xl font-bold tabular-nums text-ink outline-none placeholder:text-muted focus:border-accent"
         />
         <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-sm text-muted">
           kg
@@ -157,7 +157,7 @@ export function SegmentedControl<T extends string>({
   onChange: (value: T) => void;
 }) {
   return (
-    <div role="group" aria-label={label} className="grid auto-cols-fr grid-flow-col gap-1 rounded-2xl border border-line bg-bg p-1">
+    <div role="group" aria-label={label} className="grid auto-cols-fr grid-flow-col gap-1 rounded-2xl border border-line bg-black/30 p-1">
       {options.map((option) => (
         <button
           key={option.value}

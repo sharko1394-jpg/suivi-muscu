@@ -58,6 +58,15 @@ Les données de l'utilisateur sont attachées à cette adresse.
 - Superset : le repos démarre après le dernier exercice du groupe.
 - iPhone : pas de vibration possible ; le minuteur ne sonne que si l'appli est à l'écran.
 
+## Apparence
+
+- Thème voulu par l'utilisateur : fond noir, rouge dominant (`--color-accent`), surfaces en verre
+  translucide (classe `glass` dans `src/index.css`), barre d'onglets flottante.
+- Mise en page minimaliste : pas de texte d'explication dans les écrans. Garder seulement les
+  messages d'état, d'erreur et de confirmation.
+- Types de série : normale, échauffement, drop set, superset, bi-set, échec. Superset et bi-set
+  notés sur une série sont de simples étiquettes : ils ne changent pas le minuteur de repos.
+
 ## Avancement
 
 1. Données et sauvegarde : fait (avec la base PWA : installation, hors ligne, bandeau de mise à jour)

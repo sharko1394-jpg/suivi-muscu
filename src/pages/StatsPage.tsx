@@ -185,12 +185,6 @@ function ExerciseView() {
             formatValue={(value) => formatNumber(Math.round(value * 10) / 10)}
           />
         )}
-        {metric === 'e1rm' && !bodyweightOnly && (
-          <p className="text-sm text-muted">
-            Le 1RM estimé est la charge que tu pourrais soulever une seule fois, calculée d’après
-            tes séries (formule d’Epley). C’est une estimation, pas une mesure.
-          </p>
-        )}
       </Card>
 
       <Section title="Mes records">
@@ -221,9 +215,6 @@ function ExerciseView() {
             </tbody>
           </table>
         </div>
-        <p className="px-1 text-sm text-muted">
-          Sur tout ton historique. Une série de 9 répétitions compte aussi pour 8, 5, 3 et 1.
-        </p>
       </Section>
     </div>
   );
@@ -251,10 +242,6 @@ function GeneralView() {
         <Tile label="Série en cours" value={String(stats.streaks.current)} detail={stats.streaks.current > 1 ? 'semaines' : 'semaine'} />
         <Tile label="Record" value={String(stats.streaks.best)} detail={stats.streaks.best > 1 ? 'semaines' : 'semaine'} />
       </div>
-      <p className="px-1 text-sm text-muted">
-        Une série compte les semaines de suite avec au moins une séance. La semaine en cours ne la
-        casse pas tant qu’elle n’est pas finie.
-      </p>
 
       <Section title="Séances par semaine">
         <Card>
@@ -312,10 +299,6 @@ function GeneralView() {
                 </li>
               ))}
             </ul>
-            <p className="text-sm text-muted">
-              Chaque série est comptée pour le muscle principal de l’exercice. Les échauffements ne
-              comptent pas.
-            </p>
           </Card>
         </Section>
       )}
@@ -399,7 +382,6 @@ function BodyView() {
           <Button type="submit" variant="primary" disabled={weight.trim() === ''}>
             Enregistrer
           </Button>
-          <p className="text-sm text-muted">Une pesée par jour : la nouvelle remplace l’ancienne.</p>
         </form>
       </Card>
 

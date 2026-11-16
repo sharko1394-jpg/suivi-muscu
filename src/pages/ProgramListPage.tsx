@@ -50,10 +50,6 @@ export function ProgramListPage() {
         {programs !== undefined && programs.length === 0 && (
           <Card className="space-y-3">
             <p className="text-lg font-semibold">Aucun programme pour l’instant</p>
-            <p className="text-muted">
-              Un programme regroupe tes séances (par exemple Upper A et Lower A) et les exercices
-              prévus dans chacune. Tu pourras le modifier quand tu veux.
-            </p>
             <Button variant="primary" onClick={() => setCreating(true)}>
               Créer mon programme
             </Button>
@@ -69,10 +65,6 @@ export function ProgramListPage() {
         {programs !== undefined && programs.length > 0 && active.length === 0 && (
           <Card className="border-gold/50">
             <p className="font-semibold">Aucun programme actif</p>
-            <p className="text-muted">
-              Ouvre un programme et choisis «&nbsp;Utiliser ce programme&nbsp;» pour qu’il
-              détermine ta séance du jour.
-            </p>
           </Card>
         )}
 

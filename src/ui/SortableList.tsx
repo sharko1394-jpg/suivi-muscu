@@ -103,8 +103,8 @@ function SortableRow({ id, children }: { id: string; children: (handle: ReactNod
     <li
       ref={setNodeRef}
       style={{ transform: CSS.Translate.toString(transform), transition }}
-      className={`border-b border-line/60 bg-surface last:border-b-0 ${
-        isDragging ? 'relative z-10 bg-raised shadow-xl shadow-black/60' : ''
+      className={`border-b border-line/60 last:border-b-0 ${
+        isDragging ? 'glass relative z-10 rounded-2xl' : ''
       }`}
     >
       {children(handle)}

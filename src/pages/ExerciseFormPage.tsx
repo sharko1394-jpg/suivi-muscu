@@ -264,11 +264,6 @@ function ExerciseForm({
 
         {exercise && (
           <Card className="space-y-3">
-            <p className="text-sm text-muted">
-              {exercise.archived
-                ? 'Cet exercice est masqué : il n’apparaît plus dans les listes.'
-                : 'Masquer un exercice le retire des listes sans rien effacer : ton historique reste intact.'}
-            </p>
             <Button onClick={toggleArchived} disabled={busy}>
               {exercise.archived ? 'Réafficher cet exercice' : 'Masquer cet exercice'}
             </Button>

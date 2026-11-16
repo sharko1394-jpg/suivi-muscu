@@ -33,7 +33,7 @@ import {
   messageOf,
   plural,
 } from '../ui/format';
-import { isIOS, isStandalone, saveFile } from '../ui/platform';
+import { saveFile } from '../ui/platform';
 import { useToast } from '../ui/toast';
 
 type Delivery = { file: File; kind: 'backup' | 'csv' };
@@ -200,23 +200,12 @@ export function SettingsPage() {
               onChange={handleFileChosen}
             />
 
-            <p className="text-sm text-muted">
-              La sauvegarde est un fichier qui contient toutes tes données. Range-le ailleurs que
-              sur ce téléphone (iCloud Drive, e-mail à toi-même…).
-            </p>
           </Card>
 
           <Card className="space-y-3">
             <Button onClick={handleCsv} disabled={busy || !counts || counts.sessions === 0}>
               Exporter l’historique (CSV)
             </Button>
-            <p className="text-sm text-muted">
-              {counts && counts.sessions === 0
-                ? 'Disponible dès ta première séance terminée. '
-                : ''}
-              Un tableau de toutes tes séries, à ouvrir dans Excel ou Numbers. Il ne remplace pas
-              la sauvegarde.
-            </p>
           </Card>
         </Section>
 
@@ -247,14 +236,8 @@ export function SettingsPage() {
                 canDecrement={settings.defaultRestSec > 0}
                 canIncrement={settings.defaultRestSec < 900}
               />
-              <p className="text-sm text-muted">
-                Le pas est ce qu’ajoute ou retire un appui sur les boutons − et +. Tu peux en
-                choisir un autre pour un exercice précis, dans sa fiche. Le repos par défaut sert
-                aux exercices ajoutés en cours de séance et aux nouveaux exercices du programme.
-              </p>
               <Switch
                 label="Son à la fin du repos"
-                detail="Sur iPhone, le son ne sort pas si le téléphone est en mode silencieux."
                 checked={settings.soundEnabled}
                 onChange={(checked) => void setSetting('soundEnabled', checked)}
               />
@@ -302,11 +285,6 @@ export function SettingsPage() {
             />
             {storage?.state === 'not-persisted' && (
               <>
-                <p className="text-sm text-muted">
-                  {isIOS() && !isStandalone()
-                    ? 'Installe l’appli sur l’écran d’accueil : l’iPhone protège alors ses données.'
-                    : 'Le téléphone l’accorde en général une fois l’appli installée et utilisée régulièrement.'}
-                </p>
                 <Button onClick={askPersistence} disabled={busy}>
                   Redemander
                 </Button>
@@ -325,10 +303,6 @@ export function SettingsPage() {
             <Button onClick={checkForUpdate} disabled={busy}>
               Rechercher une mise à jour
             </Button>
-            <p className="text-sm text-muted">
-              Aucun compte, aucun serveur : tes données ne quittent jamais ce téléphone, sauf dans
-              les fichiers que tu exportes toi-même.
-            </p>
           </Card>
         </Section>
       </div>

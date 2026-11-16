@@ -73,9 +73,6 @@ function EditView({ detail, back }: { detail: SessionDetail; back: string }) {
       <PageHeader title="Corriger la séance" subtitle={session.workoutName} onBack={leave} />
 
       <div className="space-y-8 p-4 pb-8">
-        <p className="text-muted">
-          Touche une série pour la modifier. Chaque changement est enregistré tout de suite.
-        </p>
 
         <Section title="Jour de la séance">
           <input
@@ -272,7 +269,7 @@ function NoteInput({
       autoComplete="off"
       autoCapitalize="sentences"
       enterKeyHint="done"
-      className="h-13 w-full rounded-2xl border border-line bg-bg px-4 text-ink outline-none placeholder:text-muted focus:border-accent"
+      className="h-13 w-full rounded-2xl border border-line bg-black/30 px-4 text-ink outline-none placeholder:text-muted focus:border-accent"
     />
   );
 }

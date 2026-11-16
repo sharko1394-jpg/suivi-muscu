@@ -2,7 +2,7 @@ import { defineConfig, minimal2023Preset } from '@vite-pwa/assets-generator/conf
 
 // Génère les icônes de l'appli à partir de public/logo.svg (commande : npm run icons).
 // Le logo a déjà son fond sombre et ses marges : pas de marge ajoutée.
-const background = '#0a0c10';
+const background = '#000000';
 
 export default defineConfig({
   preset: {

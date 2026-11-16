@@ -47,8 +47,10 @@ export const EQUIPMENT_LABELS: Record<Equipment, string> = {
 export const EQUIPMENTS = Object.keys(EQUIPMENT_LABELS) as Equipment[];
 
 export const SET_TYPE_LABELS: Record<SetType, string> = {
-  warmup: 'Échauffement',
   normal: 'Normale',
-  drop: 'Dégressive',
+  warmup: 'Échauffement',
+  drop: 'Drop set',
+  superset: 'Superset',
+  biset: 'Bi-set',
   failure: 'Échec',
 };

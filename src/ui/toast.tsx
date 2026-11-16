@@ -33,8 +33,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             onClick={() => setToast(null)}
             className={`pointer-events-auto flex max-w-md items-start gap-3 rounded-2xl border px-4 py-3 text-base font-medium shadow-xl shadow-black/60 ${
               toast.kind === 'error'
-                ? 'border-danger/60 bg-[#2a1416] text-ink'
-                : 'border-line bg-raised text-ink'
+                ? 'glass border-danger/60 text-ink'
+                : 'glass text-ink'
             }`}
           >
             {toast.kind === 'error' ? (

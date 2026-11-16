@@ -173,10 +173,6 @@ function PlanCard({
     return (
       <Card className="space-y-3">
         <p className="text-lg font-semibold">Aucun programme actif</p>
-        <p className="text-muted">
-          Prépare ton programme pour que l’appli te propose chaque jour la bonne séance, ou lance
-          une séance libre tout de suite.
-        </p>
         <Link to={PROGRAM_LIST} className={buttonClass('primary')}>
           Préparer mon programme
         </Link>
@@ -204,7 +200,6 @@ function PlanCard({
         <div>
           <p className="text-sm font-semibold uppercase tracking-wider text-muted">{program.name}</p>
           <p className="text-3xl font-bold leading-tight">Repos aujourd’hui</p>
-          <p className="text-muted">Aucune séance n’est prévue ce jour-là.</p>
         </div>
         <div className="grid grid-cols-2 gap-2">
           {chooseButton}
@@ -291,7 +286,6 @@ function BackupReminder() {
       <p className="text-lg font-semibold">
         Ta dernière sauvegarde date de plus de {BACKUP_REMINDER_DAYS} jours
       </p>
-      <p className="text-muted">Un fichier de sauvegarde te protège si tu perds ton téléphone.</p>
       <div className="grid grid-cols-2 gap-2">
         <Button variant="ghost" onClick={() => void snoozeBackupReminder()}>
           Plus tard
@@ -321,10 +315,6 @@ function InstallHint() {
           «&nbsp;Ajouter à l’écran d’accueil&nbsp;».
         </p>
       )}
-      <p className="text-muted">
-        Fais-le avant d’enregistrer quoi que ce soit : l’appli installée garde ses données à part
-        de celles du navigateur.
-      </p>
     </Card>
   );
 }
