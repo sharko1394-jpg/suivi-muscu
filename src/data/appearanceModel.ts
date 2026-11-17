@@ -11,9 +11,10 @@
 
 // ---------- Onglets ----------
 
-export type TabId = 'today' | 'program' | 'history' | 'stats' | 'coach' | 'settings';
+export type TabId = 'today' | 'program' | 'history' | 'stats' | 'coach' | 'library' | 'settings';
 
-export const TAB_IDS: TabId[] = ['today', 'program', 'history', 'stats', 'coach', 'settings'];
+/** Ordre d'origine. Un onglet ajouté dans une nouvelle version prend sa place dans l'ordre déjà choisi. */
+export const TAB_IDS: TabId[] = ['today', 'program', 'history', 'stats', 'coach', 'library', 'settings'];
 
 /** Onglets impossibles à masquer : on y démarre les séances, et on y retrouve la personnalisation. */
 export const LOCKED_TABS: TabId[] = ['today', 'settings'];
@@ -47,7 +48,9 @@ export type WidgetId =
   | 'records'
   | 'forecast'
   | 'bodyweight'
-  | 'volume';
+  | 'volume'
+  | 'streak'
+  | 'goals';
 
 /** Petit = une demi-largeur ; grand = toute la largeur. */
 export type WidgetSize = 'small' | 'large';
@@ -69,6 +72,8 @@ export interface WidgetDef {
 export const WIDGETS: WidgetDef[] = [
   // C'est là qu'on démarre ou reprend une séance : il ne peut pas disparaître.
   { id: 'plan', label: 'Séance du jour', sizes: ['large'], locked: true },
+  { id: 'streak', label: 'Séances d’affilée', sizes: ['small', 'large'] },
+  { id: 'goals', label: 'Mes objectifs', sizes: ['small', 'large'] },
   { id: 'doneToday', label: 'Fait aujourd’hui', sizes: ['large'] },
   { id: 'week', label: 'Cette semaine', sizes: ['small', 'large'] },
   { id: 'lastSession', label: 'Dernière séance', sizes: ['small', 'large'] },
@@ -357,6 +362,8 @@ export interface Appearance extends Look {
   effects: Effects;
   tabs: TabsLayout;
   home: WidgetSlot[];
+  /** Version de l'accueil enregistré : un widget de base ajouté depuis n'y entre qu'une seule fois. */
+  homeVersion: number;
 }
 
 export const DEFAULT_BACKGROUND: BackgroundSettings = {
@@ -390,11 +397,27 @@ export const DEFAULT_TABS: TabsLayout = {
   start: 'today',
 };
 
-/** L'accueil de la V1 : la séance du jour, puis ce qui a été fait aujourd'hui. */
+/**
+ * Accueil de base : la séance du jour, la série de séances d'affilée et les objectifs côte à côte,
+ * puis ce qui a été fait aujourd'hui. (En V1 et V2.0 : la séance du jour et « Fait aujourd'hui ».)
+ */
 export const DEFAULT_HOME: WidgetSlot[] = [
   { id: 'plan', size: 'large' },
+  { id: 'streak', size: 'small' },
+  { id: 'goals', size: 'small' },
   { id: 'doneToday', size: 'large' },
 ];
+
+/** Version actuelle de l'accueil de base. */
+export const HOME_VERSION = 2;
+
+/** Widgets de base apparus à chaque version : ajoutés une fois à un accueil déjà personnalisé. */
+const NEW_HOME_WIDGETS: Record<number, WidgetSlot[]> = {
+  2: [
+    { id: 'streak', size: 'small' },
+    { id: 'goals', size: 'small' },
+  ],
+};
 
 export const DEFAULT_APPEARANCE: Appearance = {
   ...DEFAULT_LOOK,
@@ -403,6 +426,7 @@ export const DEFAULT_APPEARANCE: Appearance = {
   effects: { ripples: true, recordWave: true, restBreath: true },
   tabs: DEFAULT_TABS,
   home: DEFAULT_HOME,
+  homeVersion: HOME_VERSION,
 };
 
 /** Couleurs principales proposées d'un appui (on peut aussi choisir n'importe quelle couleur). */
@@ -540,7 +564,14 @@ export function normalizeLook(raw: unknown, base: Look = DEFAULT_LOOK): Look {
 export function normalizeTabs(raw: unknown): TabsLayout {
   const r = isObject(raw) ? raw : {};
   const listed = Array.isArray(r.order) ? r.order.filter((id): id is TabId => TAB_IDS.includes(id as TabId)) : [];
-  const order = [...new Set([...listed, ...TAB_IDS])];
+  // Un onglet absent (apparu dans une version plus récente) se place juste après celui qui le précède
+  // d'origine : la Bibliothèque arrive après Conseils, même si l'ordre a été changé.
+  const order = [...new Set(listed)];
+  TAB_IDS.forEach((id, index) => {
+    if (order.includes(id)) return;
+    const before = TAB_IDS.slice(0, index).reverse().find((other) => order.includes(other));
+    order.splice(before ? order.indexOf(before) + 1 : 0, 0, id);
+  });
   const hidden = Array.isArray(r.hidden)
     ? [...new Set(r.hidden.filter((id): id is TabId => TAB_IDS.includes(id as TabId) && !LOCKED_TABS.includes(id as TabId)))]
     : [];
@@ -580,9 +611,25 @@ export function normalizeHome(raw: unknown): WidgetSlot[] {
   return slots;
 }
 
+/** Ajoute à un accueil déjà enregistré les widgets de base apparus depuis sa version (une seule fois). */
+function withNewHomeWidgets(home: WidgetSlot[], version: number): WidgetSlot[] {
+  const slots = [...home];
+  for (let v = version + 1; v <= HOME_VERSION; v++) {
+    let at = slots.findIndex((s) => s.id === 'plan') + 1;
+    for (const slot of NEW_HOME_WIDGETS[v] ?? []) {
+      if (slots.some((s) => s.id === slot.id)) continue;
+      slots.splice(at++, 0, { ...slot });
+    }
+  }
+  return slots;
+}
+
 export function normalizeAppearance(raw: unknown): Appearance {
   const r = isObject(raw) ? raw : {};
   const effects = isObject(r.effects) ? r.effects : {};
+  // Accueil enregistré avant la version 2 : pas de numéro de version.
+  const homeVersion =
+    typeof r.homeVersion === 'number' && Number.isInteger(r.homeVersion) ? Math.min(Math.max(1, r.homeVersion), HOME_VERSION) : 1;
   return {
     ...normalizeLook(r),
     textSize: oneOf(r.textSize, TEXT_SIZES, DEFAULT_APPEARANCE.textSize),
@@ -593,7 +640,8 @@ export function normalizeAppearance(raw: unknown): Appearance {
       restBreath: bool(effects.restBreath, true),
     },
     tabs: normalizeTabs(r.tabs),
-    home: normalizeHome(r.home),
+    home: Array.isArray(r.home) ? withNewHomeWidgets(normalizeHome(r.home), homeVersion) : normalizeHome(r.home),
+    homeVersion: HOME_VERSION,
   };
 }
 

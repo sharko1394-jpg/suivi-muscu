@@ -3,6 +3,7 @@ import {
   GOALS,
   MUSCLE_LABELS,
   getCoachReport,
+  getGoalStatuses,
   setSetting,
   useLive,
   type BalanceAlert,
@@ -11,7 +12,8 @@ import {
   type Goal,
   type LoadStatus,
 } from '../data';
-import { Card, PageHeader, Section, StatTile } from '../ui/components';
+import { Card, LinkRow, PageHeader, Section, StatTile } from '../ui/components';
+import { GOALS_PATH } from './paths';
 import { SegmentedControl } from '../ui/controls';
 import { formatKg, formatLoad, formatNumber, formatReps, formatShortDate } from '../ui/format';
 import { IconTrendDown, IconTrendFlat, IconTrendUp } from '../ui/icons';
@@ -19,17 +21,26 @@ import { IconTrendDown, IconTrendFlat, IconTrendUp } from '../ui/icons';
 /** Onglet Conseils : analyse des séances, charges à ajuster, répartition du volume, records à venir. */
 export default function CoachPage() {
   const report = useLive(() => getCoachReport(), []);
+  const personal = useLive(() => getGoalStatuses(), []);
+  const inProgress = personal?.filter((g) => g.achievedOn === null).length ?? 0;
 
   return (
     <>
       <PageHeader title="Conseils" />
       <div className="space-y-8 p-4 pb-8">
-        <SegmentedControl<Goal>
-          label="Objectif"
-          value={report?.goal ?? 'muscle'}
-          options={(Object.keys(GOALS) as Goal[]).map((goal) => ({ value: goal, label: GOALS[goal].label }))}
-          onChange={(goal) => void setSetting('goal', goal)}
-        />
+        <div className="space-y-3">
+          <SegmentedControl<Goal>
+            label="Objectif"
+            value={report?.goal ?? 'muscle'}
+            options={(Object.keys(GOALS) as Goal[]).map((goal) => ({ value: goal, label: GOALS[goal].label }))}
+            onChange={(goal) => void setSetting('goal', goal)}
+          />
+          <LinkRow
+            to={GOALS_PATH}
+            title="Mes objectifs"
+            detail={inProgress > 0 ? `${inProgress} en cours` : personal && personal.length > 0 ? 'Tous atteints' : 'Fixe-toi un défi'}
+          />
+        </div>
 
         {report !== undefined && report.totalSessions === 0 && (
           <Card>
@@ -126,7 +137,7 @@ function suggestion({ advice, repMax, equipment }: ExerciseCoaching): string {
   }
 }
 
-function LoadCard({ exercise }: { exercise: ExerciseCoaching }) {
+export function LoadCard({ exercise }: { exercise: ExerciseCoaching }) {
   const { advice } = exercise;
   const status = STATUS[advice.status];
   const Icon = status.icon;
@@ -224,7 +235,7 @@ function VolumeSection({ report }: { report: CoachReport }) {
 
 // ---------- Records à venir ----------
 
-function ForecastCard({ exercise }: { exercise: ExerciseCoaching }) {
+export function ForecastCard({ exercise }: { exercise: ExerciseCoaching }) {
   const { candidate, projection } = exercise.forecast;
   return (
     <div className="rounded-3xl border border-line bg-surface px-4 py-3">

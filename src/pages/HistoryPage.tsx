@@ -11,7 +11,8 @@ import {
 import { Card, PageHeader } from '../ui/components';
 import { SegmentedControl } from '../ui/controls';
 import { formatDay, formatDuration, formatMonth, formatVolume, plural } from '../ui/format';
-import { IconChevronLeft, IconChevronRight, IconSearch } from '../ui/icons';
+import { IconChevronLeft, IconChevronRight, IconSearch, IconSparkle } from '../ui/icons';
+import { recapPath } from './paths';
 import { summaryPath } from './SessionPage';
 
 type View = 'list' | 'calendar';
@@ -131,9 +132,20 @@ function ListView({ entries }: { entries: HistoryEntry[] }) {
     <div className="space-y-6">
       {months.map((month) => (
         <section key={month.key} className="space-y-2">
-          <h2 className="px-1 text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-muted">
-            {month.label} · {plural(month.entries.length, 'séance')}
-          </h2>
+          <div className="flex items-center gap-2">
+            <h2 className="min-w-0 flex-1 px-1 text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-muted">
+              {month.label} · {plural(month.entries.length, 'séance')}
+            </h2>
+            {/* Bilan du mois : chiffres, records, progrès. */}
+            <Link
+              to={recapPath(month.key)}
+              className="flex min-h-9 shrink-0 items-center gap-1 rounded-full border border-line bg-surface pl-3 pr-2 text-sm font-semibold active:bg-raised"
+            >
+              <IconSparkle className="size-4 text-gold" />
+              Bilan
+              <IconChevronRight className="size-4 text-muted" />
+            </Link>
+          </div>
           <SessionRows entries={month.entries} />
         </section>
       ))}

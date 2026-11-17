@@ -200,6 +200,47 @@ export const IconPalette = (p: IconProps) => (
   </Icon>
 );
 
+/** Flamme : la série de séances d'affilée. */
+export const IconFlame = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M12 3c.5 3-1.8 4.6-3.2 6.3C7.4 11 6.5 12.7 6.5 14.8A5.5 5.5 0 0 0 12 20.5a5.5 5.5 0 0 0 5.5-5.7c0-2.3-1-4-2.2-5.4-.3 1.3-1 2.2-2 2.6.6-2.9-.1-6.1-1.3-9z" />
+  </Icon>
+);
+
+/** Cible : les objectifs personnels. */
+export const IconTarget = (p: IconProps) => (
+  <Icon {...p}>
+    <circle cx="12" cy="12" r="8.5" />
+    <circle cx="12" cy="12" r="4.5" />
+    <circle cx="12" cy="12" r="0.8" fill="currentColor" />
+  </Icon>
+);
+
+/** Livre ouvert : la bibliothèque d'exercices. */
+export const IconLibrary = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M12 6.5C10.2 5 7.6 4.5 4 4.5v13c3.6 0 6.2.5 8 2 1.8-1.5 4.4-2 8-2v-13c-3.6 0-6.2.5-8 2z" />
+    <path d="M12 6.5v13" />
+  </Icon>
+);
+
+/** Coupe : record ou objectif atteint. */
+export const IconTrophy = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M8 4h8v5a4 4 0 0 1-8 0z" />
+    <path d="M8 6H5a2.5 2.5 0 0 0 3 4M16 6h3a2.5 2.5 0 0 1-3 4" />
+    <path d="M12 13v4M8.5 20.5h7M10 17h4l.5 3.5h-5z" />
+  </Icon>
+);
+
+/** Étoile : bilan du mois et de l'année. */
+export const IconSparkle = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M12 3.5l2.1 5.4 5.4 2.1-5.4 2.1-2.1 5.4-2.1-5.4L4.5 11l5.4-2.1z" />
+    <path d="M19 16.5v4M17 18.5h4" />
+  </Icon>
+);
+
 export const IconShare = (p: IconProps) => (
   <Icon {...p}>
     <path d="M12 15V3.5M8 7l4-4 4 4" />

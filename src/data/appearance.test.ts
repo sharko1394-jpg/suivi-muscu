@@ -36,7 +36,7 @@ const PIXEL =
 const photo = (name = 'Salle') => ({ name, dataUrl: PIXEL, width: 1, height: 1 });
 
 describe('thème « Défaut » = la V1', () => {
-  it('reprend exactement les réglages de la V1', () => {
+  it('reprend exactement l’apparence de la V1', () => {
     expect(DEFAULT_APPEARANCE).toMatchObject({
       accent: '#b5121b',
       cardOpacity: 0.46,
@@ -47,19 +47,25 @@ describe('thème « Défaut » = la V1', () => {
       motion: 'auto',
       effects: { ripples: true, recordWave: true, restBreath: true },
       background: { kind: 'animated', preset: 'forge', speed: 1, intensity: 1 },
-      tabs: {
-        order: ['today', 'program', 'history', 'stats', 'coach', 'settings'],
-        hidden: [],
-        labels: {},
-        labelMode: 'active',
-        style: 'floating',
-        start: 'today',
-      },
-      home: [
-        { id: 'plan', size: 'large' },
-        { id: 'doneToday', size: 'large' },
-      ],
     });
+  });
+
+  it('onglets et accueil de base (ils ne font pas partie du thème)', () => {
+    expect(DEFAULT_APPEARANCE.tabs).toEqual({
+      order: ['today', 'program', 'history', 'stats', 'coach', 'library', 'settings'],
+      hidden: [],
+      labels: {},
+      labelMode: 'active',
+      style: 'floating',
+      start: 'today',
+    });
+    // Depuis la 2.1 : la série de séances d'affilée et les objectifs, côte à côte.
+    expect(DEFAULT_APPEARANCE.home).toEqual([
+      { id: 'plan', size: 'large' },
+      { id: 'streak', size: 'small' },
+      { id: 'goals', size: 'small' },
+      { id: 'doneToday', size: 'large' },
+    ]);
   });
 
   it('le fond « Forge » garde les couleurs de la V1', () => {
@@ -105,6 +111,7 @@ describe('réglages abîmés ou venus d’ailleurs', () => {
         start: 'coach',
       },
       home: [{ id: 'records', size: 'énorme' }, { id: 'inconnu' }, { id: 'records', size: 'small' }],
+      homeVersion: 2,
     });
     expect(fixed.accent).toBe('#b5121b');
     expect(fixed.cardOpacity).toBe(0.9);
@@ -115,14 +122,14 @@ describe('réglages abîmés ou venus d’ailleurs', () => {
     // Une photo sans référence : retour au fond animé.
     expect(fixed.background.kind).toBe('animated');
     expect(fixed.background.speed).toBe(2);
-    // Tous les onglets restent rangés quelque part, sans doublon.
-    expect(fixed.tabs.order).toEqual(['stats', 'today', 'program', 'history', 'coach', 'settings']);
+    // Tous les onglets restent rangés quelque part, sans doublon : les absents reprennent leur place d'origine.
+    expect(fixed.tabs.order).toEqual(['today', 'program', 'history', 'stats', 'coach', 'library', 'settings']);
     // Aujourd'hui et Réglages ne peuvent pas être masqués.
     expect(fixed.tabs.hidden).toEqual(['coach']);
     expect(fixed.tabs.labels).toEqual({ stats: 'Mes courbes', settings: 'Un nom vraimen' });
     // Un onglet masqué ne peut pas s'ouvrir au démarrage.
     expect(fixed.tabs.start).toBe('today');
-    expect(visibleTabs(fixed.tabs)).toEqual(['stats', 'today', 'program', 'history', 'settings']);
+    expect(visibleTabs(fixed.tabs)).toEqual(['today', 'program', 'history', 'stats', 'library', 'settings']);
     // La séance du jour revient toujours sur l'accueil ; widgets inconnus et doublons écartés.
     expect(fixed.home).toEqual([
       { id: 'plan', size: 'large' },
@@ -131,11 +138,56 @@ describe('réglages abîmés ou venus d’ailleurs', () => {
   });
 
   it('un widget ne prend que les tailles qu’il sait afficher', () => {
-    const fixed = normalizeAppearance({ home: [{ id: 'plan', size: 'small' }, { id: 'volume', size: 'small' }] });
+    const fixed = normalizeAppearance({
+      homeVersion: 2,
+      home: [{ id: 'plan', size: 'small' }, { id: 'volume', size: 'small' }],
+    });
     expect(fixed.home).toEqual([
       { id: 'plan', size: 'large' },
       { id: 'volume', size: 'large' },
     ]);
+  });
+});
+
+describe('nouveautés de la 2.1 sur une personnalisation déjà enregistrée', () => {
+  // Ce que la 2.0 enregistrait : six onglets, pas de numéro de version de l'accueil.
+  const saved20 = {
+    tabs: { order: ['today', 'coach', 'stats', 'program', 'history', 'settings'], hidden: ['history'] },
+    home: [
+      { id: 'plan', size: 'large' },
+      { id: 'week', size: 'small' },
+      { id: 'records', size: 'small' },
+    ],
+  };
+
+  it('la Bibliothèque se range juste après Conseils, même dans un ordre personnalisé', () => {
+    const appearance = normalizeAppearance(saved20);
+    expect(appearance.tabs.order).toEqual(['today', 'coach', 'library', 'stats', 'program', 'history', 'settings']);
+    expect(appearance.tabs.hidden).toEqual(['history']);
+  });
+
+  it('la série et les objectifs arrivent une fois sur l’accueil, juste après la séance du jour', () => {
+    const appearance = normalizeAppearance(saved20);
+    expect(appearance.home).toEqual([
+      { id: 'plan', size: 'large' },
+      { id: 'streak', size: 'small' },
+      { id: 'goals', size: 'small' },
+      { id: 'week', size: 'small' },
+      { id: 'records', size: 'small' },
+    ]);
+    expect(appearance.homeVersion).toBe(2);
+  });
+
+  it('un widget de base retiré ne revient pas', async () => {
+    const database = await freshDb();
+    await database.settings.put({ key: 'appearance', value: saved20, updatedAt: 0 });
+    await updateAppearance(
+      (current) => ({ home: current.home.filter((slot) => slot.id !== 'streak') }),
+      database,
+    );
+    const appearance = await getAppearance(database);
+    expect(appearance.home.map((slot) => slot.id)).toEqual(['plan', 'goals', 'week', 'records']);
+    database.close();
   });
 });
 

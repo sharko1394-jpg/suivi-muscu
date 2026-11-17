@@ -3,8 +3,11 @@ import {
   AppError,
   localDate,
   type DataCounts,
+  type GoalStatus,
   type Lift,
+  type PersonalGoal,
   type PlannedExercise,
+  type RecapPeriod,
   type SetEntry,
 } from '../data';
 
@@ -139,6 +142,62 @@ export function describeCounts(counts: DataCounts): string {
     plural(counts.customExercises, 'exercice personnel', 'exercices personnels'),
     plural(counts.bodyweights, 'pesée'),
   ].join(', ');
+}
+
+const monthOnly = new Intl.DateTimeFormat('fr-FR', { month: 'long' });
+
+/** « novembre » */
+export const formatMonthName = (year: number, monthIndex: number) => monthOnly.format(new Date(year, monthIndex, 1, 12));
+
+/** Titre d'un bilan : « Novembre 2026 » ou « Année 2026 ». */
+export function formatRecapTitle(period: RecapPeriod): string {
+  if (period.kind === 'year') return `Année ${period.year}`;
+  const text = formatMonth(period.year, period.month! - 1);
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+/** « d’octobre », « de novembre » : l'élision devant une voyelle. */
+export function formatOfMonth(period: RecapPeriod): string {
+  const name = formatMonthName(period.year, period.month! - 1);
+  return /^[aeiouyh]/.test(name) ? `d’${name}` : `de ${name}`;
+}
+
+/** Ce que vise un objectif : « 100 kg × 5 », « 15 rép. », « 75 kg », « 50 séances ». */
+export function formatGoalTarget(goal: PersonalGoal): string {
+  if (goal.kind === 'lift') {
+    if (goal.target === 0) return `${goal.reps} rép.`;
+    return goal.reps > 1 ? `${formatKg(goal.target)} × ${goal.reps}` : formatKg(goal.target);
+  }
+  if (goal.kind === 'bodyweight') return formatKg(goal.target);
+  return plural(goal.target, 'séance');
+}
+
+/** Une valeur suivie par un objectif, dans son unité. */
+export function formatGoalValue(status: Pick<GoalStatus, 'unit'>, value: number): string {
+  if (status.unit === 'kg') return formatKg(value);
+  if (status.unit === 'reps') return `${value} rép.`;
+  return plural(value, 'séance');
+}
+
+/** Temps restant avant la date limite : « dans 12 jours », « aujourd’hui », « dépassée ». */
+export function formatDaysLeft(daysLeft: number): string {
+  if (daysLeft < 0) return 'date dépassée';
+  if (daysLeft === 0) return 'aujourd’hui';
+  if (daysLeft === 1) return 'demain';
+  return `dans ${daysLeft} jours`;
+}
+
+const weekdayLong = new Intl.DateTimeFormat('fr-FR', { weekday: 'long' });
+
+/** Jour proche dit simplement : « aujourd’hui », « demain », « jeudi », sinon « le 20 nov. ». */
+export function formatNearDay(date: string, today: string): string {
+  const days = Math.round(
+    (new Date(`${date}T12:00:00`).getTime() - new Date(`${today}T12:00:00`).getTime()) / DAY_MS,
+  );
+  if (days === 0) return 'aujourd’hui';
+  if (days === 1) return 'demain';
+  if (days > 1 && days < 7) return weekdayLong.format(new Date(`${date}T12:00:00`));
+  return `le ${formatShortDate(date)}`;
 }
 
 /** Message à montrer à l'utilisateur pour une erreur quelconque. */

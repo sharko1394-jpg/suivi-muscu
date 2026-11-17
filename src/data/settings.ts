@@ -6,9 +6,16 @@ import {
   type SavedTheme,
 } from './appearanceModel';
 import { db, type AppDB } from './db';
+import { normalizeDays, normalizeGoals, type PersonalGoal } from './goalsModel';
 
 /** Objectif d'entraînement : oriente les conseils (fourchette de répétitions, volume par muscle). */
 export type Goal = 'force' | 'muscle' | 'endurance';
+
+/** Derniers bilans vus : mois 'AAAA-MM' et année 'AAAA'. */
+export interface RecapSeen {
+  month: string | null;
+  year: string | null;
+}
 
 /** Réglages de l'appli. Stockés dans la base (pas dans localStorage). */
 export interface Settings {
@@ -36,6 +43,12 @@ export interface Settings {
   appearance: Appearance;
   /** Thèmes enregistrés par l'utilisateur. */
   savedThemes: SavedTheme[];
+  /** Rotation : jours où une séance a été passée (sert à la série de séances d'affilée). */
+  skipLog: string[];
+  /** Objectifs personnels (« 100 kg au développé couché »…). */
+  personalGoals: PersonalGoal[];
+  /** Bilans du mois et de l'année déjà vus : leur carte ne revient plus sur l'accueil. */
+  recapSeen: RecapSeen;
 }
 
 export interface RestTimer {
@@ -62,7 +75,18 @@ export const DEFAULT_SETTINGS: Settings = {
   goal: 'muscle',
   appearance: DEFAULT_APPEARANCE,
   savedThemes: [],
+  skipLog: [],
+  personalGoals: [],
+  recapSeen: { month: null, year: null },
 };
+
+function normalizeRecapSeen(raw: unknown): RecapSeen {
+  const r = typeof raw === 'object' && raw !== null ? (raw as Record<string, unknown>) : {};
+  return {
+    month: typeof r.month === 'string' && /^\d{4}-\d{2}$/.test(r.month) ? r.month : null,
+    year: typeof r.year === 'string' && /^\d{4}$/.test(r.year) ? r.year : null,
+  };
+}
 
 const SETTING_KEYS = Object.keys(DEFAULT_SETTINGS) as (keyof Settings)[];
 
@@ -78,6 +102,9 @@ export async function getSettings(database: AppDB = db): Promise<Settings> {
   // Valeurs vérifiées : un réglage abîmé ou venu d'un vieux fichier ne doit rien casser.
   settings.appearance = normalizeAppearance(stored.appearance);
   settings.savedThemes = normalizeSavedThemes(stored.savedThemes);
+  settings.skipLog = normalizeDays(stored.skipLog);
+  settings.personalGoals = normalizeGoals(stored.personalGoals);
+  settings.recapSeen = normalizeRecapSeen(stored.recapSeen);
   return settings;
 }
 

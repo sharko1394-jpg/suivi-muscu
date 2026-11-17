@@ -3,20 +3,35 @@ import { Link } from 'react-router';
 import {
   GOALS,
   MUSCLE_LABELS,
+  daysBetween,
   getBodyweightTrend,
   getCoachReport,
+  getGoalStatuses,
   getRecentRecords,
+  getSessionStreak,
   getWeekSets,
   getWeekSummary,
   listHistory,
   localDate,
   useLive,
   useSettings,
+  type GoalStatus,
   type WidgetId,
   type WidgetSize,
 } from '../data';
-import { formatAgo, formatDuration, formatKg, formatNumber, formatShortDate, formatVolume, plural } from '../ui/format';
-import { IconCheck } from '../ui/icons';
+import {
+  formatAgo,
+  formatDuration,
+  formatGoalTarget,
+  formatKg,
+  formatNearDay,
+  formatNumber,
+  formatShortDate,
+  formatVolume,
+  plural,
+} from '../ui/format';
+import { IconCheck, IconFlame, IconTarget, IconTrophy } from '../ui/icons';
+import { GOALS_PATH } from './paths';
 import { summaryPath } from './SessionPage';
 
 // Widgets de l'accueil (V2), en dehors de la séance du jour et de « Fait aujourd'hui ».
@@ -39,6 +54,10 @@ export function DataWidget({ id, size, now }: { id: WidgetId; size: WidgetSize; 
       return <BodyweightWidget size={size} now={now} day={day} />;
     case 'volume':
       return <VolumeWidget now={now} day={day} />;
+    case 'streak':
+      return <StreakWidget size={size} now={now} day={day} />;
+    case 'goals':
+      return <GoalsWidget size={size} now={now} day={day} />;
     default:
       return null;
   }
@@ -417,6 +436,152 @@ function VolumeWidget({ now, day }: { now: number; day: string }) {
           </li>
         ))}
       </ul>
+    </Frame>
+  );
+}
+
+// ---------- Séances d'affilée ----------
+
+function StreakWidget({ size, now, day }: { size: WidgetSize; now: number; day: string }) {
+  const streak = useLive(() => getSessionStreak(now), [day]);
+  if (!streak) return <Frame title="Séances d’affilée" size={size}>{null}</Frame>;
+  const { current, best, keepBy, recent } = streak;
+  const dueToday = current > 0 && keepBy === day;
+  const flame = (
+    <IconFlame
+      className={`shrink-0 ${size === 'small' ? 'size-7' : 'size-8'} ${current > 0 ? 'text-accent-bright' : 'text-muted'}`}
+      fill={current > 0 ? 'currentColor' : 'none'}
+      fillOpacity={0.25}
+      aria-hidden="true"
+    />
+  );
+  const record =
+    current === 0 && best === 0 ? 'Pas encore de séance' : current > 0 && current >= best ? 'Record en cours' : `Record : ${best}`;
+
+  if (size === 'small') {
+    return (
+      <Frame title="Séances d’affilée" to="/historique" size={size}>
+        <p className="mt-auto flex items-center gap-1.5 pt-3 text-3xl font-bold leading-none tabular-nums">
+          {flame}
+          {current}
+        </p>
+        <p className={`mt-1 line-clamp-2 text-sm leading-snug ${dueToday ? 'font-semibold text-accent' : 'text-muted'}`}>
+          {dueToday ? 'À faire aujourd’hui' : record}
+        </p>
+      </Frame>
+    );
+  }
+
+  return (
+    <Frame title="Séances d’affilée" to="/historique" size={size}>
+      <div className="mt-2 flex items-center gap-2">
+        {flame}
+        <p>
+          <span className="text-3xl font-bold tabular-nums">{current}</span>{' '}
+          <span className="text-muted">{current > 1 ? 'séances' : 'séance'}</span>
+        </p>
+        <p className="ml-auto text-sm font-medium text-muted">{record}</p>
+      </div>
+      {recent.length > 0 && (
+        <ol className="mt-3 flex flex-wrap gap-1.5" aria-label="Dernières séances, faites ou ratées">
+          {recent.map((kind, index) => (
+            <li
+              key={index}
+              aria-label={kind === 'done' ? 'Séance faite' : 'Séance ratée'}
+              className={`size-3.5 rounded-full ${kind === 'done' ? 'bg-accent' : 'border-2 border-muted/60'}`}
+            />
+          ))}
+        </ol>
+      )}
+      {keepBy && (
+        <p className={`mt-2 text-sm ${dueToday ? 'font-semibold text-accent' : 'text-muted'}`}>
+          {dueToday ? 'Séance à faire aujourd’hui' : `Prochaine séance au plus tard ${formatNearDay(keepBy, day)}`}
+        </p>
+      )}
+    </Frame>
+  );
+}
+
+// ---------- Mes objectifs ----------
+
+/** Barre d'avancement d'un objectif : rouge en cours, dorée une fois atteint. */
+export function GoalBar({ ratio, achieved, className = '' }: { ratio: number; achieved: boolean; className?: string }) {
+  return (
+    <span
+      className={`block h-2.5 overflow-hidden rounded-full bg-white/10 ${className}`}
+      role="progressbar"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={Math.round(ratio * 100)}
+    >
+      <span
+        className={`block h-full rounded-full transition-[width] duration-500 ${achieved ? 'bg-gold' : 'bg-accent-bright'}`}
+        style={{ width: `${Math.max(3, Math.round(ratio * 100))}%` }}
+      />
+    </span>
+  );
+}
+
+/** Objectifs à montrer : ceux atteints ces derniers jours d'abord (pour fêter), puis ceux en cours. */
+function goalsToShow(goals: GoalStatus[], day: string): GoalStatus[] {
+  const fresh = goals.filter((g) => g.achievedOn !== null && daysBetween(g.achievedOn, day) <= 3);
+  return [...fresh, ...goals.filter((g) => g.achievedOn === null)];
+}
+
+function GoalsWidget({ size, now, day }: { size: WidgetSize; now: number; day: string }) {
+  const goals = useLive(() => getGoalStatuses(now), [day]);
+  if (!goals) return <Frame title="Mes objectifs" size={size}>{null}</Frame>;
+  const shown = goalsToShow(goals, day);
+
+  if (shown.length === 0) {
+    return (
+      <Frame title="Mes objectifs" to={GOALS_PATH} size={size}>
+        <p className="mt-auto flex items-center gap-2 pt-3 font-semibold text-accent">
+          <IconTarget className="size-6 shrink-0" />
+          {goals.length > 0 ? 'Un nouveau défi ?' : 'Fixer un objectif'}
+        </p>
+      </Frame>
+    );
+  }
+
+  if (size === 'small') {
+    const goal = shown[0];
+    const achieved = goal.achievedOn !== null;
+    return (
+      <Frame title="Mes objectifs" to={GOALS_PATH} size={size}>
+        <p className="mt-2 line-clamp-2 font-semibold leading-snug">{goal.title}</p>
+        <p className="text-sm text-muted tabular-nums">{formatGoalTarget(goal.goal)}</p>
+        <GoalBar ratio={goal.ratio} achieved={achieved} className="mt-auto" />
+        <p className={`mt-1.5 flex items-center gap-1 text-sm font-semibold tabular-nums ${achieved ? 'text-gold' : ''}`}>
+          {achieved && <IconTrophy className="size-4" />}
+          {achieved ? 'Atteint !' : `${Math.round(goal.ratio * 100)} %`}
+        </p>
+      </Frame>
+    );
+  }
+
+  const more = shown.length - 3;
+  return (
+    <Frame title="Mes objectifs" to={GOALS_PATH} size={size}>
+      <ul className="mt-2 space-y-3">
+        {shown.slice(0, 3).map((goal) => (
+          <li key={goal.goal.id}>
+            <div className="mb-1.5 flex items-baseline gap-3">
+              <span className="min-w-0 flex-1 truncate font-medium">{goal.title}</span>
+              <span
+                className={`flex shrink-0 items-center gap-1 text-sm font-semibold tabular-nums ${
+                  goal.achievedOn ? 'text-gold' : ''
+                }`}
+              >
+                {goal.achievedOn && <IconTrophy className="size-4" />}
+                {formatGoalTarget(goal.goal)}
+              </span>
+            </div>
+            <GoalBar ratio={goal.ratio} achieved={goal.achievedOn !== null} />
+          </li>
+        ))}
+      </ul>
+      {more > 0 && <p className="mt-2 text-sm text-muted">et {plural(more, 'autre objectif', 'autres objectifs')}</p>}
     </Frame>
   );
 }

@@ -3,9 +3,12 @@ import { Link, useNavigate } from 'react-router';
 import {
   BACKUP_REMINDER_DAYS,
   DEFAULT_HOME,
+  getPendingRecaps,
   getTodayState,
   listExercises,
   localDate,
+  markRecapSeen,
+  recapPeriod,
   skipPlannedWorkout,
   snoozeBackupReminder,
   startSession,
@@ -19,13 +22,14 @@ import {
 } from '../data';
 import { Button, Card, PageHeader, buttonClass } from '../ui/components';
 import { HeaderButton } from '../ui/controls';
-import { formatDuration, formatLongDay, formatPlanned, messageOf } from '../ui/format';
+import { formatDuration, formatLongDay, formatOfMonth, formatPlanned, messageOf } from '../ui/format';
 import { useNow } from '../ui/hooks';
-import { IconCheck, IconChevronRight, IconShare, IconWidgets } from '../ui/icons';
+import { IconCheck, IconChevronRight, IconClose, IconShare, IconSparkle, IconWidgets } from '../ui/icons';
 import { ActionSheet, type SheetAction } from '../ui/overlays';
 import { isIOS, isStandalone } from '../ui/platform';
 import { unlockAudio } from '../ui/sound';
 import { useToast } from '../ui/toast';
+import { recapPath } from './paths';
 import { PROGRAM_LIST, programPath } from './ProgramListPage';
 import { SESSION_PATH, summaryPath } from './SessionPage';
 import { DataWidget } from './widgets';
@@ -40,6 +44,8 @@ export function TodayPage() {
   const now = useNow(60_000);
   // Relu à chaque changement de données, et au passage de minuit.
   const state = useLive(() => getTodayState(), [localDate(now)]);
+  // Bilan du mois (et de l'année en janvier) prêt et pas encore vu.
+  const recaps = useLive(() => getPendingRecaps(now), [localDate(now)]);
   const home = useSettings()?.appearance.home ?? DEFAULT_HOME;
   const [choosing, setChoosing] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -129,6 +135,7 @@ export function TodayPage() {
       />
       <div className="space-y-4 p-4 pb-8">
         {backupDue && <BackupReminder />}
+        {recaps?.map((key) => <RecapReadyCard key={key} recapKey={key} />)}
 
         {/* Emplacements choisis dans la personnalisation : petits (demi-largeur) ou grands. */}
         <div className="grid grid-cols-2 gap-4">
@@ -320,6 +327,40 @@ function WorkoutPreview({ workout }: { workout: ProgramWorkout }) {
         </li>
       ))}
     </ul>
+  );
+}
+
+/** Le bilan du mois (ou de l'année) est prêt : on l'ouvre, ou on l'écarte d'un appui. */
+function RecapReadyCard({ recapKey }: { recapKey: string }) {
+  const period = recapPeriod(recapKey);
+  if (!period) return null;
+  const year = period.kind === 'year';
+  return (
+    <div className="relative overflow-hidden rounded-3xl border border-accent/60 bg-surface p-4">
+      <span className="pointer-events-none absolute -right-12 -top-16 size-44 rounded-full bg-accent/35 blur-3xl" />
+      <div className="relative flex items-start gap-3">
+        <IconSparkle className="mt-1 size-7 shrink-0 text-gold" />
+        <div className="min-w-0 flex-1">
+          <p className="text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-muted">
+            {year ? 'Bilan de l’année' : 'Bilan du mois'}
+          </p>
+          <p className="text-xl font-bold leading-snug">
+            {year ? `Ton année ${period.year} en chiffres` : `Ton mois ${formatOfMonth(period)} en chiffres`}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => void markRecapSeen(recapKey)}
+          aria-label="Masquer ce bilan"
+          className="-mr-2 -mt-2 flex size-11 shrink-0 items-center justify-center rounded-full text-muted active:bg-raised"
+        >
+          <IconClose className="size-5" />
+        </button>
+      </div>
+      <Link to={recapPath(recapKey)} className={`${buttonClass('primary')} relative mt-3`}>
+        Voir mon bilan
+      </Link>
+    </div>
   );
 }
 

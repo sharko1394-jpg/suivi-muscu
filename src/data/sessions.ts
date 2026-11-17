@@ -725,6 +725,9 @@ export async function skipPlannedWorkout(now: number = Date.now(), database: App
         nextRotationIndex: (index + 1) % program.rotation.length,
         updatedAt: now,
       });
+      // Noté pour la série de séances d'affilée : passer sans s'entraîner ce jour-là la casse.
+      const { skipLog } = await getSettings(database);
+      await setSetting('skipLog', [...skipLog, localDate(now)].slice(-400), database);
     } else {
       await setSetting('skippedDay', { date: localDate(now), workoutId: plan.workout.id }, database);
     }

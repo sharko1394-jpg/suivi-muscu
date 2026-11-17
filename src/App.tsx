@@ -18,7 +18,11 @@ const CustomizeTabsPage = lazy(() =>
 const CustomizeHomePage = lazy(() =>
   import('./pages/CustomizePage').then((module) => ({ default: module.CustomizeHomePage })),
 );
-import { ProgramHome, ProgramListPage } from './pages/ProgramListPage';
+// 2.1 : bilans, objectifs et bibliothèque, chargés à l'ouverture.
+const RecapPage = lazy(() => import('./pages/RecapPage'));
+const GoalsPage = lazy(() => import('./pages/GoalsPage'));
+const LibraryPage = lazy(() => import('./pages/LibraryPage'));
+const ExerciseSheetPage = lazy(() => import('./pages/ExerciseSheetPage'));import { ProgramHome, ProgramListPage } from './pages/ProgramListPage';
 import { ProgramPage } from './pages/ProgramPage';
 import { SESSION_PATH, SessionPage } from './pages/SessionPage';
 import { SettingsPage } from './pages/SettingsPage';
@@ -77,6 +81,38 @@ export default function App() {
           <Route path="programme/p/:programId" element={<ProgramPage />} />
           <Route path="programme/p/:programId/s/:workoutId" element={<WorkoutPage />} />
           <Route path="historique" element={<HistoryPage />} />
+          <Route
+            path="historique/bilan/:period"
+            element={
+              <Suspense fallback={null}>
+                <RecapPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="objectifs"
+            element={
+              <Suspense fallback={null}>
+                <GoalsPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="bibliotheque"
+            element={
+              <Suspense fallback={null}>
+                <LibraryPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="bibliotheque/:exerciseId"
+            element={
+              <Suspense fallback={null}>
+                <ExerciseSheetPage />
+              </Suspense>
+            }
+          />
           <Route
             path="stats"
             element={
