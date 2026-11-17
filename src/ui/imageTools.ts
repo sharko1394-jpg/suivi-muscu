@@ -19,7 +19,8 @@ export async function prepareBackgroundImage(file: File): Promise<{ dataUrl: str
     const image = await new Promise<HTMLImageElement>((resolve, reject) => {
       const img = new Image();
       img.onload = () => resolve(img);
-      img.onerror = () => reject(new AppError('Cette image n’a pas pu être ouverte.'));
+      img.onerror = () =>
+        reject(new AppError('Cette image n’a pas pu être ouverte. Choisis-la plutôt dans « Photothèque ».'));
       img.src = url;
     });
     const scale = Math.min(1, MAX_SIDE / Math.max(image.naturalWidth, image.naturalHeight));
@@ -44,9 +45,9 @@ export async function prepareBackgroundImage(file: File): Promise<{ dataUrl: str
   }
 }
 
-/** Nom d'une photo d'après son fichier (« IMG_2041 »), sans l'extension. */
-export function photoName(file: File): string {
-  return file.name.replace(/\.[^.]+$/, '').slice(0, 40) || 'Photo';
+/** Vrai pour une photo ou une image (y compris celles de l'iPhone, en HEIC). */
+export function isImageFile(file: File): boolean {
+  return file.type.startsWith('image/') || /\.(jpe?g|png|heic|heif|webp|gif)$/i.test(file.name);
 }
 
 /** Rend une photo de fond sous forme de fichier, pour l'enregistrer ou la partager. */

@@ -58,7 +58,7 @@ import { Button, Card, ConfirmDialog, LinkRow, PageHeader, Section } from '../ui
 import { ColorChoice, SegmentedControl, Slider, Switch, Toggle } from '../ui/controls';
 import { formatNumber, messageOf, plural } from '../ui/format';
 import { IconImage, IconLock, IconMinus, IconMore, IconPencil, IconPlus } from '../ui/icons';
-import { dataUrlToFile, photoName, prepareBackgroundImage } from '../ui/imageTools';
+import { dataUrlToFile, isImageFile, prepareBackgroundImage } from '../ui/imageTools';
 import { ActionSheet, PromptDialog } from '../ui/overlays';
 import { saveFile } from '../ui/platform';
 import { TAB_DEFS, tabLabel } from '../ui/tabs';
@@ -283,34 +283,43 @@ export default function CustomizePage() {
       );
     });
 
-  const onThemeFileChosen = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    event.target.value = '';
-    if (!file) return;
-    run(async () => setPendingImport(parseThemeFile(await file.text())));
+  const photosFull = () => {
+    if (images.length < MAX_CUSTOM_BACKGROUNDS) return false;
+    toast(`Tu as déjà ${MAX_CUSTOM_BACKGROUNDS} photos de fond : supprimes-en une d’abord.`, 'error');
+    return true;
   };
 
-  const onPhotoChosen = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    event.target.value = '';
-    if (!file) return;
+  /** Photo choisie dans la galerie : réduite sur le téléphone, puis mise en fond. */
+  const importPhoto = (file: File) => {
+    if (photosFull()) return;
     setBusy(true);
     run(async () => {
       try {
         const image = await prepareBackgroundImage(file);
-        await addCustomBackground({ name: photoName(file), ...image });
+        await addCustomBackground({ name: `Photo ${images.length + 1}`, ...image });
       } finally {
         setBusy(false);
       }
     }, 'Photo ajoutée en fond');
   };
 
+  const onPhotoChosen = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (file) importPhoto(file);
+  };
+
+  // « Importer » accepte une photo de la galerie (elle devient le fond) ou un fichier de thème.
+  const onImportChosen = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    if (isImageFile(file)) importPhoto(file);
+    else run(async () => setPendingImport(parseThemeFile(await file.text())));
+  };
+
   const addPhoto = () => {
-    if (images.length >= MAX_CUSTOM_BACKGROUNDS) {
-      toast(`Tu as déjà ${MAX_CUSTOM_BACKGROUNDS} photos de fond : supprimes-en une d’abord.`, 'error');
-      return;
-    }
-    photoInput.current?.click();
+    if (!photosFull()) photoInput.current?.click();
   };
 
   return (
@@ -359,6 +368,26 @@ export default function CustomizePage() {
 
         <Section title="Fond">
           <TileRow label="Fond">
+            {/* En premier, pour être vu tout de suite : une photo de la galerie du téléphone. */}
+            <AddTile
+              label={busy ? 'Import…' : 'Galerie'}
+              icon={<IconImage className="size-7" />}
+              onClick={busy ? () => {} : addPhoto}
+            />
+            {images.map((image) => (
+              <Tile
+                key={image.id}
+                label={image.name}
+                selected={background.kind === 'image' && background.imageId === image.id}
+                onClick={() => setBackground({ kind: 'image', imageId: image.id })}
+                onMore={() => setPhotoMenu(image)}
+              >
+                <span
+                  className="block h-28 rounded-2xl bg-cover bg-center"
+                  style={{ backgroundImage: `url("${image.dataUrl}")` }}
+                />
+              </Tile>
+            ))}
             {ANIMATED_PRESET_IDS.map((id) => (
               <Tile
                 key={id}
@@ -385,25 +414,6 @@ export default function CustomizePage() {
                 style={{ background: flatBackground({ ...background, kind: 'gradient' }) }}
               />
             </Tile>
-            {images.map((image) => (
-              <Tile
-                key={image.id}
-                label={image.name}
-                selected={background.kind === 'image' && background.imageId === image.id}
-                onClick={() => setBackground({ kind: 'image', imageId: image.id })}
-                onMore={() => setPhotoMenu(image)}
-              >
-                <span
-                  className="block h-28 rounded-2xl bg-cover bg-center"
-                  style={{ backgroundImage: `url("${image.dataUrl}")` }}
-                />
-              </Tile>
-            ))}
-            <AddTile
-              label={busy ? 'Import…' : 'Ma photo'}
-              icon={<IconImage className="size-7" />}
-              onClick={busy ? () => {} : addPhoto}
-            />
           </TileRow>
 
           <Card className="space-y-5">
@@ -633,13 +643,14 @@ export default function CustomizePage() {
         </Button>
       </div>
 
+      {/* Sur iPhone, « image/* » propose la Photothèque (la galerie) en premier choix. */}
       <input ref={photoInput} type="file" accept="image/*" className="hidden" onChange={onPhotoChosen} />
       <input
         ref={themeInput}
         type="file"
-        accept="application/json,.json"
+        accept="image/*,application/json,.json"
         className="hidden"
-        onChange={onThemeFileChosen}
+        onChange={onImportChosen}
       />
 
       <PromptDialog

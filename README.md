@@ -43,12 +43,15 @@ Tout se règle dans **Réglages → Personnaliser l'appli**, et s'applique tout 
   « Enregistrer » garde ta création dans « Mes thèmes ».
 - **Couleur principale**, **fond** (animé, uni, dégradé ou **ta propre photo**), **cartes**
   (opacité, flou, coins), **texte** (police, taille) et **animations**.
+- **Ta photo en fond** : dans **Fond**, touche la première vignette **« Galerie »**, puis
+  **« Photothèque »** dans le menu de l'iPhone, et choisis ta photo.
 - **Onglets** : glisse les lignes par leur poignée pour changer l'ordre, masque ceux qui ne te
   servent pas, touche un nom pour le changer, et choisis l'onglet qui s'ouvre au lancement.
 - **Accueil** : ajoute, retire, déplace des widgets et choisis leur taille (petit ou grand).
   Le bouton en haut à droite de l'écran « Aujourd'hui » y mène directement.
 - **Partager** : « Exporter » crée un fichier avec toute ta personnalisation (et ta photo de fond),
-  à garder ou à envoyer ; « Importer » l'applique sur un autre téléphone.
+  à garder ou à envoyer ; « Importer » l'applique sur un autre téléphone. « Importer » accepte
+  aussi une photo de la galerie : elle devient ton fond.
 
 Les photos de fond restent sur le téléphone et partent dans tes sauvegardes.
 

@@ -123,7 +123,9 @@ Les données de l'utilisateur sont attachées à cette adresse.
 - Accueil : widgets petits (demi-largeur) ou grands (`src/pages/widgets.tsx`) : séance du jour,
   fait aujourd'hui, cette semaine, dernière séance, prêts à monter, records récents, prochain record,
   poids de corps, séries de la semaine.
-- Photos : réduites sur le téléphone (1800 px, JPEG), 8 au plus, incluses dans les sauvegardes.
+- Photos : choisies par la vignette « Galerie » (première de la ligne Fond, `accept="image/*"` : sur
+  iPhone, le menu propose la Photothèque) ou par « Importer », qui accepte aussi les photos. Réduites
+  sur le téléphone (1800 px, JPEG), 8 au plus, incluses dans les sauvegardes.
   Fichier de personnalisation partageable (.json) avec la photo affichée.
 
 ## Avancement
