@@ -297,11 +297,16 @@ function RecapContent({ recap }: { recap: Recap }) {
             {recap.records.slice(0, 6).map((record) => (
               <li key={record.exerciseId} className={rowClass}>
                 <IconTrophy className="size-5 shrink-0 text-gold" />
-                <span className="min-w-0 flex-1 truncate font-medium">{record.exerciseName}</span>
-                <span className="shrink-0 font-bold tabular-nums">
-                  {formatLoad(record.weight)} × {record.reps}
+                {/* Le nom en entier sur la première ligne, la performance et le jour dessous. */}
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate font-medium">{record.exerciseName}</span>
+                  <span className="block text-sm text-muted tabular-nums">
+                    <span className="font-bold text-ink">
+                      {formatLoad(record.weight)} × {record.reps}
+                    </span>{' '}
+                    · {formatShortDate(record.date)}
+                  </span>
                 </span>
-                <span className="w-14 shrink-0 text-right text-sm text-muted">{formatShortDate(record.date)}</span>
               </li>
             ))}
           </Rows>

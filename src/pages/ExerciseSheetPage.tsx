@@ -82,6 +82,7 @@ export default function ExerciseSheetPage() {
         title={exercise.name}
         subtitle={`${MUSCLE_LABELS[exercise.primaryMuscle]} · ${EQUIPMENT_LABELS[exercise.equipment]}`}
         onBack={back}
+        wrap
       />
       <div className="space-y-7 p-4 pb-8">
         <Card className="space-y-3 overflow-hidden p-3">
@@ -156,7 +157,10 @@ export default function ExerciseSheetPage() {
               </div>
               {entry!.maxWeight !== null && entry!.maxWeight > 0 && (
                 <div className="grid grid-cols-3 gap-2">
-                  <StatTile label="Charge max" value={formatKg(entry!.maxWeight)} />
+                  <StatTile
+                    label={exercise.equipment === 'poids-du-corps' ? 'Lest max' : 'Charge max'}
+                    value={formatKg(entry!.maxWeight)}
+                  />
                   <StatTile label="Séries" value={String(entry!.sets)} />
                   <StatTile
                     label="Progrès"

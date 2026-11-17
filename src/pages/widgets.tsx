@@ -459,13 +459,15 @@ function StreakWidget({ size, now, day }: { size: WidgetSize; now: number; day: 
     current === 0 && best === 0 ? 'Pas encore de séance' : current > 0 && current >= best ? 'Record en cours' : `Record : ${best}`;
 
   if (size === 'small') {
+    // Demi-largeur : un titre court, le chiffre, puis ce qu'il compte et le record.
     return (
-      <Frame title="Séances d’affilée" to="/historique" size={size}>
+      <Frame title="Ma série" to="/historique" size={size}>
         <p className="mt-auto flex items-center gap-1.5 pt-3 text-3xl font-bold leading-none tabular-nums">
           {flame}
           {current}
         </p>
-        <p className={`mt-1 line-clamp-2 text-sm leading-snug ${dueToday ? 'font-semibold text-accent' : 'text-muted'}`}>
+        <p className="mt-1 text-sm leading-snug text-muted">{current > 1 ? 'séances' : 'séance'} d’affilée</p>
+        <p className={`text-sm leading-snug ${dueToday ? 'font-semibold text-accent' : 'text-muted'}`}>
           {dueToday ? 'À faire aujourd’hui' : record}
         </p>
       </Frame>

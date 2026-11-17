@@ -47,18 +47,21 @@ export function libraryEntries(exercises: Exercise[], sets: SetEntry[], sessions
     let bestE1rm: number | null = null;
     let maxWeight = 0;
     let maxReps = 0;
+    // Au poids du corps, la charge saisie n'est que le lest : un 1RM estimé dessus n'aurait pas de sens.
+    // On suit alors les répétitions sans lest.
+    const bodyweight = exercise.equipment === 'poids-du-corps';
     // Une valeur par séance : 1RM estimé, ou répétitions quand tout est au poids du corps.
-    const loaded = lifts.some((l) => l.weight > 0);
+    const loaded = !bodyweight && lifts.some((l) => l.weight > 0);
     const perSession = new Map<ID, { startedAt: number; value: number | null }>();
     let lastDate = '';
     for (const lift of lifts) {
       const session = sessions.get(lift.sessionId)!;
-      const e1rm = epley1RM(lift.weight, lift.reps);
+      const e1rm = bodyweight ? null : epley1RM(lift.weight, lift.reps);
       if (e1rm !== null && (bestE1rm === null || e1rm > bestE1rm)) bestE1rm = e1rm;
       maxWeight = Math.max(maxWeight, lift.weight);
       maxReps = Math.max(maxReps, lift.reps);
       if (session.date > lastDate) lastDate = session.date;
-      const value = loaded ? e1rm : lift.reps;
+      const value = loaded ? e1rm : bodyweight && lift.weight > 0 ? null : lift.reps;
       const entry = perSession.get(session.id) ?? { startedAt: session.startedAt, value: null };
       if (value !== null && (entry.value === null || value > entry.value)) entry.value = value;
       perSession.set(session.id, entry);
@@ -85,8 +88,11 @@ export function libraryEntries(exercises: Exercise[], sets: SetEntry[], sessions
 
 const byName = (a: LibraryEntry, b: LibraryEntry) => a.exercise.name.localeCompare(b.exercise.name, 'fr');
 
-/** Force d'un exercice : 1RM estimé, sinon charge max ; au poids du corps seul, rien de comparable. */
-const strength = (e: LibraryEntry) => e.bestE1rm ?? (e.maxWeight !== null && e.maxWeight > 0 ? e.maxWeight : null);
+/** Force d'un exercice : 1RM estimé, sinon charge max ; au poids du corps (même lesté), rien de comparable. */
+const strength = (e: LibraryEntry) =>
+  e.exercise.equipment === 'poids-du-corps'
+    ? null
+    : (e.bestE1rm ?? (e.maxWeight !== null && e.maxWeight > 0 ? e.maxWeight : null));
 
 /** Trie la liste. Les exercices jamais faits restent à la fin, par ordre alphabétique. */
 export function sortLibrary(entries: LibraryEntry[], sort: LibrarySort): LibraryEntry[] {

@@ -34,9 +34,12 @@ export function PageHeader({
   backTo,
   onBack,
   action,
+  wrap = false,
 }: {
   title: string;
   subtitle?: string;
+  /** Titre long (nom d'exercice) : sur deux lignes plutôt que coupé. */
+  wrap?: boolean;
   /** Page vers laquelle la flèche de retour ramène. */
   backTo?: string;
   /** À la place de backTo : action à faire au retour (ex. revenir à la page précédente). */
@@ -61,7 +64,7 @@ export function PageHeader({
       <div className="min-w-0 flex-1">
         {/* Titre court en grand ; un titre long passe un cran plus petit pour ne pas être coupé. */}
         <h1
-          className={`truncate font-bold leading-tight tracking-tight ${
+          className={`${wrap ? 'line-clamp-2' : 'truncate'} font-bold leading-tight tracking-tight ${
             title.length > 16 ? 'text-2xl' : 'text-[1.75rem]'
           }`}
         >

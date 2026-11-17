@@ -35,6 +35,28 @@ données : ce que tu saisis dans l'une n'apparaît pas dans l'autre.
 - Dans **Réglages → Mes données**, la ligne « Protection contre l'effacement automatique » doit
   indiquer « Activée ». Si ce n'est pas le cas, touche « Redemander ».
 
+## Rester motivé
+
+- **Ma série** (sur l'accueil) : le nombre de séances faites d'affilée sans en rater une. Une séance
+  est ratée quand un jour prévu passe sans entraînement (en jours fixes, la séance faite le
+  lendemain compte), quand tu passes une séance de la rotation sans t'entraîner ce jour-là, ou
+  après plus de 7 jours sans séance. Le widget dit jusqu'à quand tu peux t'entraîner pour la garder.
+- **Mes objectifs** : une charge à atteindre sur un exercice (par exemple 100 kg × 5), un poids de
+  corps, ou un nombre de séances, avec une date limite si tu veux. Ils se trouvent sur l'accueil,
+  dans **Conseils → Mes objectifs** et sur la fiche de chaque exercice.
+- **Bilans** : le 1er de chaque mois, une carte « Ton mois en chiffres » apparaît sur l'accueil
+  (et en janvier, celle de l'année). Tu peux aussi ouvrir le bilan de n'importe quel mois avec le
+  bouton **« Bilan »** de l'Historique, et partager son image.
+
+## Bibliothèque d'exercices
+
+L'onglet **Bibliothèque** liste tous les exercices. Trie-les (les plus faits, les plus forts, ceux où
+tu progresses le plus, les plus récents, A → Z) et filtre-les par muscle. Chaque fiche montre le
+mouvement animé avec les muscles travaillés en rouge, comment le faire, les conseils, les erreurs à
+éviter, puis tes stats, ta courbe et tes records sur cet exercice.
+
+Quand tous les onglets ne tiennent pas, fais glisser la barre du bas de gauche à droite.
+
 ## Personnaliser l'appli
 
 Tout se règle dans **Réglages → Personnaliser l'appli**, et s'applique tout de suite :

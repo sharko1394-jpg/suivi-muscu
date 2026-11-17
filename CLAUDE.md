@@ -36,9 +36,17 @@ sur iPhone. Le cahier des charges complet est dans `docs/cahier-des-charges.md` 
   la V1 (étiquette `v1-final`) peut toujours rouvrir les données. `getSettings` ne lit que les clés
   connues (`bulkGet`), jamais les photos. Valeurs toujours passées par `normalizeAppearance`.
 - Le thème « Défaut » reproduit exactement la V1 (`DEFAULT_APPEARANCE`, fond `forge`, testé) : ne pas
-  modifier ses valeurs. Ne jamais changer la signature des fichiers de thème (`THEME_FILE_APP`).
+  modifier ses valeurs d'apparence (couleur, fond, verre, coins, police). Ne jamais changer la
+  signature des fichiers de thème (`THEME_FILE_APP`).
+- Onglets et accueil de base peuvent évoluer, sans casser ce que l'utilisateur a rangé : un onglet
+  nouveau se place juste après celui qui le précède d'origine (`normalizeTabs`) ; un widget de base
+  nouveau entre une seule fois dans un accueil déjà enregistré (`HOME_VERSION`, `NEW_HOME_WIDGETS`).
 - La séance du jour (widget `plan`) reste toujours sur l'accueil, Aujourd'hui et Réglages restent
   toujours dans les onglets : sans eux, impossible de démarrer une séance ou de revenir en arrière.
+- 2.1 : séances passées de la rotation (`skipLog`), objectifs (`personalGoals`) et bilans déjà vus
+  (`recapSeen`) vivent aussi dans `settings` : la base reste en version 1.
+- Exercices au poids du corps : la charge saisie n'est que le lest, jamais de 1RM estimé dessus
+  (bibliothèque, bilans) ; on suit les répétitions sans lest.
 
 ## Façon de travailler
 
@@ -79,7 +87,8 @@ Les données de l'utilisateur sont attachées à cette adresse.
   l'objectif ; alertes d'équilibre poussée/tirage, haut/bas, quadriceps/ischios.
 - Records à venir : record à portée d'après le 1RM estimé récent (dans la fourchette travaillée,
   ± 2 rép.), et projection du 1RM estimé sur 8 semaines jusqu'au prochain palier de 5 kg.
-- Six onglets : sur un écran de moins de 420 px, l'onglet ouvert n'affiche que son icône.
+- Sept onglets (avec la Bibliothèque) : la barre défile de gauche à droite quand ils ne tiennent pas
+  (bords estompés du côté où il en reste), et l'onglet ouvert vient se placer au milieu.
 
 ## Apparence
 
@@ -121,8 +130,28 @@ Les données de l'utilisateur sont attachées à cette adresse.
 - Onglets : ordre, masquer (sauf Aujourd'hui et Réglages), renommer, noms (actif / tous / aucun),
   barre flottante ou pleine largeur, onglet d'ouverture. Définitions dans `src/ui/tabs.tsx`.
 - Accueil : widgets petits (demi-largeur) ou grands (`src/pages/widgets.tsx`) : séance du jour,
-  fait aujourd'hui, cette semaine, dernière séance, prêts à monter, records récents, prochain record,
-  poids de corps, séries de la semaine.
+  ma série (séances d'affilée), mes objectifs, fait aujourd'hui, cette semaine, dernière séance,
+  prêts à monter, records récents, prochain record, poids de corps, séries de la semaine.
+  Accueil de base depuis la 2.1 : séance du jour, ma série et mes objectifs côte à côte, fait aujourd'hui.
+
+## Motivation et bibliothèque (2.1)
+
+- Ma série (`src/data/streak.ts`) : séances d'affilée sans en rater une. Ratée = un jour prévu (jours
+  fixes) sans séance avant le jour prévu suivant ; une séance passée en rotation sans entraînement ce
+  jour-là ; plus de 7 jours de repos d'affilée. Chaque programme est jugé sur la période où on l'a
+  suivi (`scheduleRuns`). Tout est recalculé à partir de l'historique.
+- Bilans (`src/data/recap.ts`, page `historique/bilan/AAAA-MM` ou `AAAA`) : carte sur l'accueil le 1er
+  du mois (et en janvier pour l'année), lien « Bilan » sur chaque mois de l'Historique, image à
+  partager dessinée sur le téléphone. Un bilan n'est marqué « vu » que si sa période est finie.
+- Mes objectifs (`src/data/goals.ts`, page `objectifs`) : charge pour N répétitions (0 kg = répétitions
+  au poids du corps), poids de corps, nombre de séances ; date limite facultative. Un objectif déjà
+  atteint est refusé à la création.
+- Bibliothèque (onglet, `src/pages/LibraryPage.tsx`) : tris (plus faits, plus forts, plus de progrès,
+  récents, A → Z) et filtre par muscle. Fiche (`ExerciseSheetPage.tsx`) : mannequin animé
+  (`src/ui/ExerciseModel.tsx`, positions dans `src/ui/exerciseModels.ts`), étapes, conseils, erreurs
+  à éviter (`src/data/exerciseGuide.ts`), stats, conseil de charge, objectifs. Chaque exercice fourni
+  doit avoir son mouvement dans `MOVEMENT_OF` (testé) ; un exercice personnel est rattaché d'après
+  son nom quand c'est clair.
 - Photos : choisies par la vignette « Galerie » (première de la ligne Fond, `accept="image/*"` : sur
   iPhone, le menu propose la Photothèque) ou par « Importer », qui accepte aussi les photos. Réduites
   sur le téléphone (1800 px, JPEG), 8 au plus, incluses dans les sauvegardes.
@@ -149,6 +178,8 @@ Les données de l'utilisateur sont attachées à cette adresse.
 8. Lisibilité (hiérarchie, espacements, gris plus clair) et séance libre réparée : fait (version 1.2.1).
    **V1 finale** : étiquette git `v1-final` (commit 3d0ea87).
 9. Personnalisation complète (V2) : fait (version 2.0.0).
+10. Ma série, bilans du mois et de l'année, objectifs perso, barre d'onglets qui défile, onglet
+    Bibliothèque : fait (version 2.1.0). Les dessins animés restent à affiner au fil des retours.
 
 ## Commandes
 

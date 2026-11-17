@@ -205,7 +205,9 @@ export function buildRecap(period: RecapPeriod, input: RecapInput): Recap {
   for (const exerciseId of exercises.keys()) {
     const during = periodSets.filter((s) => s.exerciseId === exerciseId);
     const before = counted.filter((s) => s.exerciseId === exerciseId && dateOf(s) < period.start);
-    const loaded = during.some((s) => s.weight > 0);
+    // Au poids du corps, la charge n'est que le lest : on suit les répétitions sans lest.
+    const bodyweight = during.some((s) => snapshots.get(s.sessionExerciseId)?.equipment === 'poids-du-corps');
+    const loaded = !bodyweight && during.some((s) => s.weight > 0);
     const metric = (list: typeof counted): number | null => {
       let best: number | null = null;
       for (const set of list) {
