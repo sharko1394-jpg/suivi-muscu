@@ -22,7 +22,10 @@ const CustomizeHomePage = lazy(() =>
 const RecapPage = lazy(() => import('./pages/RecapPage'));
 const GoalsPage = lazy(() => import('./pages/GoalsPage'));
 const LibraryPage = lazy(() => import('./pages/LibraryPage'));
-const ExerciseSheetPage = lazy(() => import('./pages/ExerciseSheetPage'));import { ProgramHome, ProgramListPage } from './pages/ProgramListPage';
+const ExerciseSheetPage = lazy(() => import('./pages/ExerciseSheetPage'));
+// 2.2 : nutrition et profil.
+const NutritionPage = lazy(() => import('./pages/NutritionPage'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));import { ProgramHome, ProgramListPage } from './pages/ProgramListPage';
 import { ProgramPage } from './pages/ProgramPage';
 import { SESSION_PATH, SessionPage } from './pages/SessionPage';
 import { SettingsPage } from './pages/SettingsPage';
@@ -129,7 +132,23 @@ export default function App() {
               </Suspense>
             }
           />
+          <Route
+            path="nutrition"
+            element={
+              <Suspense fallback={null}>
+                <NutritionPage />
+              </Suspense>
+            }
+          />
           <Route path="reglages" element={<SettingsPage />} />
+          <Route
+            path="reglages/profil"
+            element={
+              <Suspense fallback={null}>
+                <ProfilePage />
+              </Suspense>
+            }
+          />
           <Route
             path="reglages/personnaliser"
             element={

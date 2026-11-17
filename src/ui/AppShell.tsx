@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { useBackupDue, useSettings, visibleTabs, type TabsLayout } from '../data';
 import { TAB_DEFS, tabLabel } from './tabs';
@@ -8,29 +8,81 @@ import { TAB_DEFS, tabLabel } from './tabs';
  * Cadre commun à toutes les pages.
  * Le contenu défile sous une barre d'onglets flottante en verre, qui le laisse deviner.
  */
+/**
+ * Le doigt est-il posé sur quelque chose qui se fait déjà glisser de côté (pastilles, barre qui défile,
+ * graphique), ou dans un champ ou une fenêtre ? Alors le geste ne change pas d'onglet.
+ */
+function blocksSwipe(target: EventTarget | null): boolean {
+  for (let el = target instanceof Element ? target : null; el && el !== document.body; el = el.parentElement) {
+    if (el.matches('input, textarea, select, [role="dialog"], [data-no-swipe]')) return true;
+    if (el instanceof HTMLElement && el.tagName !== 'MAIN' && el.scrollWidth > el.clientWidth + 2) {
+      const overflow = getComputedStyle(el).overflowX;
+      if (overflow === 'auto' || overflow === 'scroll') return true;
+    }
+  }
+  return false;
+}
+
 export function AppShell() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const main = useRef<HTMLElement>(null);
   // Onglets personnalisés (ordre, noms, style). Pas de barre tant qu'ils ne sont pas lus : pas d'éclair.
   const tabs = useSettings()?.appearance.tabs ?? null;
   const docked = tabs?.style === 'docked';
+  const touch = useRef<{ x: number; y: number; time: number; blocked: boolean } | null>(null);
+  const [slide, setSlide] = useState<'left' | 'right' | null>(null);
 
   // Chaque page s'ouvre en haut.
   useEffect(() => {
     main.current?.scrollTo(0, 0);
   }, [pathname]);
 
+  // Glisser vers la gauche ou la droite sur une page d'onglet : onglet suivant ou précédent.
+  const ids = tabs ? visibleTabs(tabs) : [];
+  const current = ids.findIndex((id) => TAB_DEFS[id].path === pathname);
+  const onTouchStart = (event: React.TouchEvent) => {
+    if (event.touches.length !== 1 || current === -1) {
+      touch.current = null;
+      return;
+    }
+    const t = event.touches[0];
+    touch.current = { x: t.clientX, y: t.clientY, time: Date.now(), blocked: blocksSwipe(event.target) };
+  };
+  const onTouchEnd = (event: React.TouchEvent) => {
+    const start = touch.current;
+    touch.current = null;
+    if (!start || start.blocked || current === -1) return;
+    const t = event.changedTouches[0];
+    const dx = t.clientX - start.x;
+    const dy = t.clientY - start.y;
+    // Un vrai glissement de côté : assez long, net, et plutôt horizontal que vertical.
+    if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 2 || Date.now() - start.time > 700) return;
+    const next = current + (dx < 0 ? 1 : -1);
+    if (next < 0 || next >= ids.length) return;
+    setSlide(dx < 0 ? 'left' : 'right');
+    navigate(TAB_DEFS[ids[next]].path);
+  };
+
   return (
     <div className="relative mx-auto h-dvh max-w-xl">
       <main
         ref={main}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
         className={`h-full overflow-y-auto overscroll-contain ${
           tabs?.labelMode === 'always'
             ? 'pb-[calc(env(safe-area-inset-bottom)+6.5rem)]'
             : 'pb-[calc(env(safe-area-inset-bottom)+5.5rem)]'
         }`}
       >
-        <Outlet />
+        <div
+          key={pathname}
+          className={slide === 'left' ? 'tab-in-left' : slide === 'right' ? 'tab-in-right' : undefined}
+          onAnimationEnd={(event) => event.target === event.currentTarget && setSlide(null)}
+        >
+          <Outlet />
+        </div>
       </main>
       <div
         className={`pointer-events-none absolute z-20 space-y-2 ${

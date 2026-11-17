@@ -9,3 +9,7 @@ export const recapPath = (key: string) => `/historique/bilan/${key}`;
 export const LIBRARY_PATH = '/bibliotheque';
 
 export const libraryExercisePath = (exerciseId: string) => `${LIBRARY_PATH}/${encodeURIComponent(exerciseId)}`;
+
+export const PROFILE_PATH = '/reglages/profil';
+
+export const NUTRITION_PATH = '/nutrition';

@@ -10,6 +10,7 @@ import {
   csvFileName,
   exportBackup,
   importBackup,
+  localDate,
   markBackupDone,
   parseBackup,
   requestPersistence,
@@ -30,10 +31,12 @@ import {
   formatBytes,
   formatDateTime,
   formatNumber,
+  formatProfileSummary,
   formatRest,
   messageOf,
   plural,
 } from '../ui/format';
+import { PROFILE_PATH } from './paths';
 import { saveFile } from '../ui/platform';
 import { useToast } from '../ui/toast';
 
@@ -169,6 +172,14 @@ export function SettingsPage() {
     <>
       <PageHeader title="Réglages" />
       <div className="space-y-8 p-4 pb-8">
+        <Section title="Profil">
+          <LinkRow
+            to={PROFILE_PATH}
+            title="Mon profil"
+            detail={settings ? formatProfileSummary(settings.profile, localDate(Date.now())) : undefined}
+          />
+        </Section>
+
         <Section title="Apparence">
           <LinkRow
             to="/reglages/personnaliser"

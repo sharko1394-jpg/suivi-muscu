@@ -11,10 +11,10 @@
 
 // ---------- Onglets ----------
 
-export type TabId = 'today' | 'program' | 'history' | 'stats' | 'coach' | 'library' | 'settings';
+export type TabId = 'today' | 'program' | 'history' | 'stats' | 'coach' | 'nutrition' | 'library' | 'settings';
 
 /** Ordre d'origine. Un onglet ajouté dans une nouvelle version prend sa place dans l'ordre déjà choisi. */
-export const TAB_IDS: TabId[] = ['today', 'program', 'history', 'stats', 'coach', 'library', 'settings'];
+export const TAB_IDS: TabId[] = ['today', 'program', 'history', 'stats', 'coach', 'nutrition', 'library', 'settings'];
 
 /** Onglets impossibles à masquer : on y démarre les séances, et on y retrouve la personnalisation. */
 export const LOCKED_TABS: TabId[] = ['today', 'settings'];
@@ -50,7 +50,8 @@ export type WidgetId =
   | 'bodyweight'
   | 'volume'
   | 'streak'
-  | 'goals';
+  | 'goals'
+  | 'nutrition';
 
 /** Petit = une demi-largeur ; grand = toute la largeur. */
 export type WidgetSize = 'small' | 'large';
@@ -74,6 +75,7 @@ export const WIDGETS: WidgetDef[] = [
   { id: 'plan', label: 'Séance du jour', sizes: ['large'], locked: true },
   { id: 'streak', label: 'Séances d’affilée', sizes: ['small', 'large'] },
   { id: 'goals', label: 'Mes objectifs', sizes: ['small', 'large'] },
+  { id: 'nutrition', label: 'Calories du jour', sizes: ['small', 'large'] },
   { id: 'doneToday', label: 'Fait aujourd’hui', sizes: ['large'] },
   { id: 'week', label: 'Cette semaine', sizes: ['small', 'large'] },
   { id: 'lastSession', label: 'Dernière séance', sizes: ['small', 'large'] },

@@ -48,6 +48,23 @@ données : ce que tu saisis dans l'une n'apparaît pas dans l'autre.
   (et en janvier, celle de l'année). Tu peux aussi ouvrir le bilan de n'importe quel mois avec le
   bouton **« Bilan »** de l'Historique, et partager son image.
 
+## Nutrition
+
+1. Remplis d'abord **Réglages → Mon profil** : sexe, date de naissance, taille, poids, ton travail
+   (assis, debout ou physique) et ton nombre de pas moyen par jour.
+2. Dans l'onglet **Nutrition**, choisis ton objectif : **sèche**, **maintien** ou **prise de masse**.
+3. L'appli estime ta dépense du jour (métabolisme de base, vie quotidienne, pas, séances, digestion)
+   et te dit combien manger, avec les protéines, glucides et lipides.
+4. Ajoute ce que tu manges : dans la liste d'aliments (avec la quantité), dans tes récents, ou à la
+   main. Touche la ligne « Pas » pour noter les pas réels d'une journée.
+5. Pèse-toi 2 à 3 fois par semaine : la rubrique « Mon rythme » te dit si tu dois manger un peu plus
+   ou un peu moins.
+
+Ce sont des estimations : aucune appli ne mesure exactement les calories. L'iPhone ne laisse pas une
+appli web lire tes pas dans l'app Santé : la moyenne de ton profil sert par défaut.
+
+Astuce : sur un onglet, glisse le doigt vers la gauche ou la droite pour passer à l'onglet voisin.
+
 ## Bibliothèque d'exercices
 
 L'onglet **Bibliothèque** liste tous les exercices. Trie-les (les plus faits, les plus forts, ceux où

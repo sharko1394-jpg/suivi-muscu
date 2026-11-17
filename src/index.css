@@ -204,3 +204,21 @@ input[type='range'] {
     display: none;
   }
 }
+
+/* Changement d'onglet par glissement : la nouvelle page arrive du côté du geste. */
+@keyframes tab-in-left {
+  from { opacity: 0.35; transform: translateX(44px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes tab-in-right {
+  from { opacity: 0.35; transform: translateX(-44px); }
+  to { opacity: 1; transform: none; }
+}
+.tab-in-left { animation: tab-in-left 0.26s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.tab-in-right { animation: tab-in-right 0.26s cubic-bezier(0.2, 0.8, 0.2, 1); }
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion='full']) .tab-in-left,
+  html:not([data-motion='full']) .tab-in-right { animation: none; }
+}
+html[data-motion='reduced'] .tab-in-left,
+html[data-motion='reduced'] .tab-in-right { animation: none; }

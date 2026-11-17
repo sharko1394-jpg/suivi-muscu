@@ -1,12 +1,14 @@
 import {
   DAY_MS,
   AppError,
+  ageOn,
   localDate,
   type DataCounts,
   type GoalStatus,
   type Lift,
   type PersonalGoal,
   type PlannedExercise,
+  type Profile,
   type RecapPeriod,
   type SetEntry,
 } from '../data';
@@ -198,6 +200,16 @@ export function formatNearDay(date: string, today: string): string {
   if (days === 1) return 'demain';
   if (days > 1 && days < 7) return weekdayLong.format(new Date(`${date}T12:00:00`));
   return `le ${formatShortDate(date)}`;
+}
+
+/** Résumé du profil : « Homme · 30 ans · 180 cm », ou ce qu'il reste à faire. */
+export function formatProfileSummary(profile: Profile, today: string): string {
+  const parts = [
+    profile.sex === 'male' ? 'Homme' : profile.sex === 'female' ? 'Femme' : null,
+    profile.birthDate ? `${ageOn(profile.birthDate, today)} ans` : null,
+    profile.heightCm ? `${profile.heightCm} cm` : null,
+  ].filter(Boolean);
+  return parts.length === 3 ? parts.join(' · ') : 'À compléter pour la nutrition';
 }
 
 /** Message à montrer à l'utilisateur pour une erreur quelconque. */

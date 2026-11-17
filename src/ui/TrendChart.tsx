@@ -73,7 +73,7 @@ export function TrendChart({
   );
 
   return (
-    <div role="img" aria-label={title} className="h-56 w-full">
+    <div role="img" aria-label={title} className="h-56 w-full" data-no-swipe>
       <ResponsiveContainer width="100%" height="100%">
         {kind === 'bar' ? (
           <BarChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: -12 }}>

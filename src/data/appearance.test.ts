@@ -52,7 +52,7 @@ describe('thème « Défaut » = la V1', () => {
 
   it('onglets et accueil de base (ils ne font pas partie du thème)', () => {
     expect(DEFAULT_APPEARANCE.tabs).toEqual({
-      order: ['today', 'program', 'history', 'stats', 'coach', 'library', 'settings'],
+      order: ['today', 'program', 'history', 'stats', 'coach', 'nutrition', 'library', 'settings'],
       hidden: [],
       labels: {},
       labelMode: 'active',
@@ -123,13 +123,13 @@ describe('réglages abîmés ou venus d’ailleurs', () => {
     expect(fixed.background.kind).toBe('animated');
     expect(fixed.background.speed).toBe(2);
     // Tous les onglets restent rangés quelque part, sans doublon : les absents reprennent leur place d'origine.
-    expect(fixed.tabs.order).toEqual(['today', 'program', 'history', 'stats', 'coach', 'library', 'settings']);
+    expect(fixed.tabs.order).toEqual(['today', 'program', 'history', 'stats', 'coach', 'nutrition', 'library', 'settings']);
     // Aujourd'hui et Réglages ne peuvent pas être masqués.
     expect(fixed.tabs.hidden).toEqual(['coach']);
     expect(fixed.tabs.labels).toEqual({ stats: 'Mes courbes', settings: 'Un nom vraimen' });
     // Un onglet masqué ne peut pas s'ouvrir au démarrage.
     expect(fixed.tabs.start).toBe('today');
-    expect(visibleTabs(fixed.tabs)).toEqual(['today', 'program', 'history', 'stats', 'library', 'settings']);
+    expect(visibleTabs(fixed.tabs)).toEqual(['today', 'program', 'history', 'stats', 'nutrition', 'library', 'settings']);
     // La séance du jour revient toujours sur l'accueil ; widgets inconnus et doublons écartés.
     expect(fixed.home).toEqual([
       { id: 'plan', size: 'large' },
@@ -160,9 +160,9 @@ describe('nouveautés de la 2.1 sur une personnalisation déjà enregistrée', (
     ],
   };
 
-  it('la Bibliothèque se range juste après Conseils, même dans un ordre personnalisé', () => {
+  it('Nutrition et Bibliothèque se rangent juste après Conseils, même dans un ordre personnalisé', () => {
     const appearance = normalizeAppearance(saved20);
-    expect(appearance.tabs.order).toEqual(['today', 'coach', 'library', 'stats', 'program', 'history', 'settings']);
+    expect(appearance.tabs.order).toEqual(['today', 'coach', 'nutrition', 'library', 'stats', 'program', 'history', 'settings']);
     expect(appearance.tabs.hidden).toEqual(['history']);
   });
 

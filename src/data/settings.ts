@@ -6,6 +6,7 @@ import {
   type SavedTheme,
 } from './appearanceModel';
 import { db, type AppDB } from './db';
+import { DEFAULT_PROFILE, normalizeProfile, type NutritionGoal, type Profile } from './energy';
 import { normalizeDays, normalizeGoals, type PersonalGoal } from './goalsModel';
 
 /** Objectif d'entraînement : oriente les conseils (fourchette de répétitions, volume par muscle). */
@@ -49,6 +50,10 @@ export interface Settings {
   personalGoals: PersonalGoal[];
   /** Bilans du mois et de l'année déjà vus : leur carte ne revient plus sur l'accueil. */
   recapSeen: RecapSeen;
+  /** Profil (Réglages → Profil) : sexe, âge, taille, travail, pas par jour en moyenne. */
+  profile: Profile;
+  /** Objectif de l'onglet Nutrition. */
+  nutritionGoal: NutritionGoal;
 }
 
 export interface RestTimer {
@@ -78,6 +83,8 @@ export const DEFAULT_SETTINGS: Settings = {
   skipLog: [],
   personalGoals: [],
   recapSeen: { month: null, year: null },
+  profile: DEFAULT_PROFILE,
+  nutritionGoal: 'maintain',
 };
 
 function normalizeRecapSeen(raw: unknown): RecapSeen {
@@ -105,6 +112,8 @@ export async function getSettings(database: AppDB = db): Promise<Settings> {
   settings.skipLog = normalizeDays(stored.skipLog);
   settings.personalGoals = normalizeGoals(stored.personalGoals);
   settings.recapSeen = normalizeRecapSeen(stored.recapSeen);
+  settings.profile = normalizeProfile(stored.profile);
+  if (!['cut', 'maintain', 'bulk'].includes(settings.nutritionGoal)) settings.nutritionGoal = 'maintain';
   return settings;
 }
 

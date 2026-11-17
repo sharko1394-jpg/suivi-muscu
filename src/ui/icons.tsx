@@ -241,6 +241,22 @@ export const IconSparkle = (p: IconProps) => (
   </Icon>
 );
 
+/** Pomme : la nutrition. */
+export const IconNutrition = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M12 7.5c-1.6-1.4-4.3-1.6-6 .2-2 2.1-1.5 6.4.6 9.6 1.3 2 2.9 3.4 4.4 2.6.6-.3.8-.4 1-.4s.4.1 1 .4c1.5.8 3.1-.6 4.4-2.6 2.1-3.2 2.6-7.5.6-9.6-1.7-1.8-4.4-1.6-6-.2z" />
+    <path d="M12 7.5C12 5 13.2 3.5 15 3" />
+  </Icon>
+);
+
+/** Silhouette : le profil. */
+export const IconProfile = (p: IconProps) => (
+  <Icon {...p}>
+    <circle cx="12" cy="8" r="3.8" />
+    <path d="M4.5 20.5c.8-4 3.8-6 7.5-6s6.7 2 7.5 6" />
+  </Icon>
+);
+
 export const IconShare = (p: IconProps) => (
   <Icon {...p}>
     <path d="M12 15V3.5M8 7l4-4 4 4" />

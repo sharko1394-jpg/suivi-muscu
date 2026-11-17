@@ -44,7 +44,8 @@ sur iPhone. Le cahier des charges complet est dans `docs/cahier-des-charges.md` 
 - La séance du jour (widget `plan`) reste toujours sur l'accueil, Aujourd'hui et Réglages restent
   toujours dans les onglets : sans eux, impossible de démarrer une séance ou de revenir en arrière.
 - 2.1 : séances passées de la rotation (`skipLog`), objectifs (`personalGoals`) et bilans déjà vus
-  (`recapSeen`) vivent aussi dans `settings` : la base reste en version 1.
+  (`recapSeen`) vivent aussi dans `settings` : la base reste en version 1. De même en 2.2 : `profile`,
+  `nutritionGoal`, et une ligne `nutrition:AAAA-MM-JJ` par jour (repas, pas du jour) que `getSettings` ne lit jamais.
 - Exercices au poids du corps : la charge saisie n'est que le lest, jamais de 1RM estimé dessus
   (bibliothèque, bilans) ; on suit les répétitions sans lest.
 
@@ -87,7 +88,7 @@ Les données de l'utilisateur sont attachées à cette adresse.
   l'objectif ; alertes d'équilibre poussée/tirage, haut/bas, quadriceps/ischios.
 - Records à venir : record à portée d'après le 1RM estimé récent (dans la fourchette travaillée,
   ± 2 rép.), et projection du 1RM estimé sur 8 semaines jusqu'au prochain palier de 5 kg.
-- Sept onglets (avec la Bibliothèque) : la barre défile de gauche à droite quand ils ne tiennent pas
+- Huit onglets (avec Nutrition et Bibliothèque) : la barre défile de gauche à droite quand ils ne tiennent pas
   (bords estompés du côté où il en reste), et l'onglet ouvert vient se placer au milieu.
 
 ## Apparence
@@ -157,6 +158,26 @@ Les données de l'utilisateur sont attachées à cette adresse.
   sur le téléphone (1800 px, JPEG), 8 au plus, incluses dans les sauvegardes.
   Fichier de personnalisation partageable (.json) avec la photo affichée.
 
+## Nutrition et profil (2.2)
+
+- Profil (Réglages → Mon profil, `src/pages/ProfilePage.tsx`) : sexe, date de naissance, taille, poids
+  (enregistré comme pesée du jour), travail (assis, debout, physique), pas par jour en moyenne.
+  Les pas moyens servent chaque jour, sauf si on note les pas du jour dans Nutrition. L'iPhone ne
+  laisse pas une appli web lire l'app Santé : pas de lecture automatique des pas.
+- Calculs (`src/data/energy.ts`, purs et testés) : métabolisme de base Mifflin-St Jeor ; vie quotidienne
+  = 10 / 25 / 45 % du métabolisme selon le travail ; pas = 0,0005 kcal × pas × kg ; séance = (MET − 1)
+  × kg × heures, MET de 3,5 à 5 selon les muscles, réparti entre les exercices ; digestion = 10 %.
+  Objectif : sèche −20 %, maintien, prise de masse +10 % ; protéines 2,2 g/kg en sèche, 1,8 sinon ;
+  lipides ≥ 0,8 g/kg ; glucides pour le reste. Rythme du poids sur 4 semaines (au moins 3 pesées sur
+  7 jours) ; conseil ± 150 kcal hors de la zone (`PACE_RANGE`).
+- Onglet Nutrition (`src/pages/NutritionPage.tsx`, données `src/data/nutrition.ts`) : objectif, jour
+  (flèches), reste à manger et barres des macros, repas (liste d'aliments `src/data/foods.ts`, récents,
+  saisie libre), dépense détaillée, rythme et conseils. Widget « Calories du jour » (pas dans
+  l'accueil de base).
+- Swipe entre onglets (`src/ui/AppShell.tsx`) : seulement sur les pages d'onglet, geste net et
+  horizontal ; ignoré dans les champs, fenêtres, graphiques (`data-no-swipe`) et tout ce qui défile
+  de côté.
+
 ## Avancement
 
 1. Données et sauvegarde : fait (avec la base PWA : installation, hors ligne, bandeau de mise à jour)
@@ -180,6 +201,8 @@ Les données de l'utilisateur sont attachées à cette adresse.
 9. Personnalisation complète (V2) : fait (version 2.0.0).
 10. Ma série, bilans du mois et de l'année, objectifs perso, barre d'onglets qui défile, onglet
     Bibliothèque : fait (version 2.1.0). Les dessins animés restent à affiner au fil des retours.
+11. Profil, onglet Nutrition (dépense, repas, sèche / maintien / prise de masse) et swipe entre
+    onglets : fait (version 2.2.0).
 
 ## Commandes
 

@@ -7,6 +7,7 @@ import {
   getBodyweightTrend,
   getCoachReport,
   getGoalStatuses,
+  getNutritionReport,
   getRecentRecords,
   getSessionStreak,
   getWeekSets,
@@ -31,7 +32,7 @@ import {
   plural,
 } from '../ui/format';
 import { IconCheck, IconFlame, IconTarget, IconTrophy } from '../ui/icons';
-import { GOALS_PATH } from './paths';
+import { GOALS_PATH, NUTRITION_PATH } from './paths';
 import { summaryPath } from './SessionPage';
 
 // Widgets de l'accueil (V2), en dehors de la séance du jour et de « Fait aujourd'hui ».
@@ -58,6 +59,8 @@ export function DataWidget({ id, size, now }: { id: WidgetId; size: WidgetSize; 
       return <StreakWidget size={size} now={now} day={day} />;
     case 'goals':
       return <GoalsWidget size={size} now={now} day={day} />;
+    case 'nutrition':
+      return <NutritionWidget size={size} day={day} />;
     default:
       return null;
   }
@@ -584,6 +587,58 @@ function GoalsWidget({ size, now, day }: { size: WidgetSize; now: number; day: s
         ))}
       </ul>
       {more > 0 && <p className="mt-2 text-sm text-muted">et {plural(more, 'autre objectif', 'autres objectifs')}</p>}
+    </Frame>
+  );
+}
+
+// ---------- Calories du jour ----------
+
+function NutritionWidget({ size, day }: { size: WidgetSize; day: string }) {
+  const report = useLive(() => getNutritionReport(day), [day]);
+  if (!report) return <Frame title="Calories" size={size}>{null}</Frame>;
+  const { targets, eaten } = report;
+  if (!targets) {
+    return (
+      <Frame title="Calories" to={NUTRITION_PATH} size={size}>
+        <Empty>Complète ton profil pour voir tes besoins</Empty>
+      </Frame>
+    );
+  }
+  const left = targets.kcal - eaten.kcal;
+  const ratio = Math.min(1, eaten.kcal / Math.max(1, targets.kcal));
+  const bar = (
+    <span className="mt-3 block h-2.5 overflow-hidden rounded-full bg-white/10">
+      <span
+        className={`block h-full rounded-full ${left < 0 ? 'bg-gold' : 'bg-accent-bright'}`}
+        style={{ width: `${Math.max(3, ratio * 100)}%` }}
+      />
+    </span>
+  );
+  if (size === 'small') {
+    return (
+      <Frame title="Calories" to={NUTRITION_PATH} size={size}>
+        <BigValue value={Math.abs(left).toLocaleString('fr-FR')} unit="kcal" tone={left < 0 ? 'gold' : 'accent'} />
+        <Sub>{left < 0 ? 'de trop aujourd’hui' : 'restantes aujourd’hui'}</Sub>
+        {bar}
+      </Frame>
+    );
+  }
+  return (
+    <Frame title="Calories du jour" to={NUTRITION_PATH} size={size}>
+      <div className="mt-2 flex items-baseline justify-between gap-3">
+        <p>
+          <span className="text-3xl font-bold tabular-nums">{eaten.kcal.toLocaleString('fr-FR')}</span>{' '}
+          <span className="text-muted">/ {targets.kcal.toLocaleString('fr-FR')} kcal</span>
+        </p>
+        <p className={`text-sm font-semibold tabular-nums ${left < 0 ? 'text-gold' : 'text-accent'}`}>
+          {left < 0 ? `+${Math.abs(left)} kcal` : `${left} restantes`}
+        </p>
+      </div>
+      {bar}
+      <p className="mt-2 text-sm text-muted tabular-nums">
+        Protéines {eaten.protein}/{targets.protein} g · Glucides {eaten.carbs}/{targets.carbs} g · Lipides {eaten.fat}/
+        {targets.fat} g
+      </p>
     </Frame>
   );
 }

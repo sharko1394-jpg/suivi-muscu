@@ -1,6 +1,15 @@
 import type { SVGProps } from 'react';
 import type { TabId, TabsLayout } from '../data';
-import { IconCoach, IconHistory, IconLibrary, IconProgram, IconSettings, IconStats, IconToday } from './icons';
+import {
+  IconCoach,
+  IconHistory,
+  IconLibrary,
+  IconNutrition,
+  IconProgram,
+  IconSettings,
+  IconStats,
+  IconToday,
+} from './icons';
 
 /** Les onglets : adresse, nom d'origine et icône. L'ordre, les noms et l'affichage se personnalisent. */
 export const TAB_DEFS: Record<TabId, { path: string; label: string; icon: (props: SVGProps<SVGSVGElement>) => React.JSX.Element }> = {
@@ -9,6 +18,7 @@ export const TAB_DEFS: Record<TabId, { path: string; label: string; icon: (props
   history: { path: '/historique', label: 'Historique', icon: IconHistory },
   stats: { path: '/stats', label: 'Stats', icon: IconStats },
   coach: { path: '/conseils', label: 'Conseils', icon: IconCoach },
+  nutrition: { path: '/nutrition', label: 'Nutrition', icon: IconNutrition },
   library: { path: '/bibliotheque', label: 'Bibliothèque', icon: IconLibrary },
   settings: { path: '/reglages', label: 'Réglages', icon: IconSettings },
 };
