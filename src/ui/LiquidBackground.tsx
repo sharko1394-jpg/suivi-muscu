@@ -343,8 +343,11 @@ export function LiquidBackground() {
     };
   }, []);
 
+  // z-index négatif : le fond reste SOUS tout le contenu de la page. Avec z-0, il passait
+  // devant tout ce qui n'est pas une carte en verre (bouton « Ajouter un exercice »,
+  // séance libre vide…), qui devenait invisible.
   return (
-    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
+    <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden" aria-hidden="true">
       {fallback ? (
         <div className="ambient-fallback">
           <span />

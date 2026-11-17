@@ -9,7 +9,7 @@ import {
   useLive,
   type SessionSummary,
 } from '../data';
-import { Card, ConfirmDialog, PageHeader, Section, buttonClass } from '../ui/components';
+import { Card, ConfirmDialog, PageHeader, Section, StatTile, buttonClass } from '../ui/components';
 import { HeaderButton } from '../ui/controls';
 import {
   formatDuration,
@@ -105,9 +105,9 @@ function SummaryView({ summary }: { summary: SessionSummary }) {
 
       <div className="space-y-8 p-4 pb-8">
         <div className="grid grid-cols-3 gap-2">
-          <Tile label="Durée" value={formatDuration(totals.durationSec)} />
-          <Tile label="Volume" value={formatVolume(totals.volume)} />
-          <Tile label="Séries" value={String(totals.setCount)} />
+          <StatTile label="Durée" value={formatDuration(totals.durationSec)} />
+          <StatTile label="Volume" value={Math.round(totals.volume).toLocaleString('fr-FR')} unit="kg" />
+          <StatTile label="Séries" value={String(totals.setCount)} />
         </div>
 
         {records.length > 0 && (
@@ -184,7 +184,7 @@ function SummaryView({ summary }: { summary: SessionSummary }) {
                       warmups > 0 ? plural(warmups, 'série d’échauffement', 'séries d’échauffement') : null,
                       exercise.volume > 0 ? `volume ${formatVolume(exercise.volume)}` : null,
                       delta !== null && delta !== 0
-                        ? `${delta > 0 ? '+' : '−'}${formatVolume(Math.abs(delta))} par rapport à la fois précédente`
+                        ? `${delta > 0 ? '+' : '−'}${formatVolume(Math.abs(delta))} vs la dernière fois`
                         : null,
                     ]
                       .filter(Boolean)
@@ -222,15 +222,6 @@ function SummaryView({ summary }: { summary: SessionSummary }) {
         </Link>
       </div>
     </>
-  );
-}
-
-function Tile({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-3xl border border-line bg-surface px-2 py-4 text-center">
-      <p className="text-xs font-semibold uppercase tracking-wider text-muted">{label}</p>
-      <p className="mt-1 text-xl font-bold tabular-nums">{value}</p>
-    </div>
   );
 }
 

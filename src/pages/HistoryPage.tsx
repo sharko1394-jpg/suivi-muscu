@@ -88,11 +88,16 @@ function SessionRows({ entries }: { entries: HistoryEntry[] }) {
             to={summaryPath(session.id)}
             className="flex min-h-18 items-center gap-3 px-4 py-3 active:bg-raised"
           >
+            {/* Le nom et le jour sur la première ligne, les chiffres en dessous. */}
             <div className="min-w-0 flex-1">
-              <p className="truncate text-lg font-semibold">{session.workoutName}</p>
-              <p className="text-sm text-muted first-letter:uppercase">
-                {formatDay(session.date)} · {formatDuration(totals.durationSec)} ·{' '}
-                {plural(totals.setCount, 'série')}
+              <div className="flex items-baseline gap-2">
+                <p className="min-w-0 flex-1 truncate text-lg font-semibold">{session.workoutName}</p>
+                <p className="shrink-0 text-sm font-medium text-muted first-letter:uppercase">
+                  {formatDay(session.date)}
+                </p>
+              </div>
+              <p className="text-sm text-muted tabular-nums">
+                {formatDuration(totals.durationSec)} · {plural(totals.setCount, 'série')}
                 {totals.volume > 0 ? ` · ${formatVolume(totals.volume)}` : ''}
               </p>
             </div>
@@ -126,7 +131,7 @@ function ListView({ entries }: { entries: HistoryEntry[] }) {
     <div className="space-y-6">
       {months.map((month) => (
         <section key={month.key} className="space-y-2">
-          <h2 className="px-1 text-sm font-semibold uppercase tracking-wider text-muted">
+          <h2 className="px-1 text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-muted">
             {month.label} · {plural(month.entries.length, 'séance')}
           </h2>
           <SessionRows entries={month.entries} />

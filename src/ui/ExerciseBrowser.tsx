@@ -174,7 +174,8 @@ export function ExercisePicker({
       aria-label={title}
     >
       <header className="flex items-center gap-2 border-b border-line/60 px-4 pb-3 pt-[calc(env(safe-area-inset-top)+0.75rem)]">
-        <h2 className="min-w-0 flex-1 truncate text-2xl font-bold">{title}</h2>
+        {/* Même taille que le titre des autres fenêtres : « Ajouter un exercice » tient en entier. */}
+        <h2 className="min-w-0 flex-1 truncate text-xl font-bold leading-tight">{title}</h2>
         {doneLabel ? (
           <button
             type="button"

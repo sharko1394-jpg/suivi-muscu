@@ -80,7 +80,7 @@ export function ActionSheet({
         className="glass grid w-full max-w-md gap-2 rounded-3xl p-4"
         onClick={(event) => event.stopPropagation()}
       >
-        <h2 className="truncate px-1 pb-1 text-sm font-semibold uppercase tracking-wider text-muted">
+        <h2 className="truncate px-1 pb-1 text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-muted">
           {title}
         </h2>
         {actions.map((action) => (

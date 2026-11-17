@@ -86,6 +86,12 @@ Les données de l'utilisateur sont attachées à cette adresse.
   puis vague rouge à la fin (messages envoyés par `src/ui/ambient.ts`). Calculé à 45 % de la
   résolution, 30 images/s sur téléphone, arrêté en arrière-plan, image fixe si « réduire les
   animations », secours en CSS sans WebGL. Cartes et en-têtes translucides pour le laisser voir.
+  Il est SOUS tout le contenu (`-z-10` dans `#root`) : avec `z-0`, il masquait tout ce qui n'est
+  pas une carte en verre (la séance libre vide paraissait sans bouton ; corrigé en 1.2.1).
+- Hiérarchie : grand titre de page, rubriques en petites capitales grises (`sectionTitleClass`),
+  chiffres clés en tuiles `StatTile` (le chiffre, puis ce qu'il mesure), réglages −/+ avec le nom
+  en petit au-dessus de la valeur, pastilles sur une seule ligne qu'on fait glisser (bord estompé),
+  actions annexes en lien discret (ex. « Passer cette séance aujourd'hui »).
 - Rouge : `--color-accent` (#b5121b, sombre) pour les fonds ; `--color-accent-bright` pour le
   texte rouge (la classe `text-accent` l'utilise), lisible sur fond sombre.
 - Mise en page minimaliste : pas de texte d'explication dans les écrans. Garder seulement les
@@ -111,6 +117,7 @@ Les données de l'utilisateur sont attachées à cette adresse.
    mensurations et photos.
 
 7. Conseils : fait (version 1.2.0).
+8. Lisibilité (hiérarchie, espacements, gris plus clair) et séance libre réparée : fait (version 1.2.1).
 
 ## Commandes
 

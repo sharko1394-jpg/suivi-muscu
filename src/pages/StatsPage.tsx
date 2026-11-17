@@ -15,7 +15,7 @@ import {
   type ExercisePoint,
   type Period,
 } from '../data';
-import { Button, Card, Chip, ConfirmDialog, PageHeader, Section } from '../ui/components';
+import { Button, Card, Chip, ConfirmDialog, PageHeader, Section, StatTile } from '../ui/components';
 import { SegmentedControl } from '../ui/controls';
 import {
   formatDay,
@@ -59,7 +59,12 @@ export default function StatsPage() {
 
 function PeriodChips({ value, onChange }: { value: Period; onChange: (period: Period) => void }) {
   return (
-    <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4" role="group" aria-label="Période">
+    // Les bords s'estompent : on voit qu'il reste des choix en faisant glisser.
+    <div
+      className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 [mask-image:linear-gradient(to_right,transparent,black_1rem,black_calc(100%-1.5rem),transparent)]"
+      role="group"
+      aria-label="Période"
+    >
       {PERIODS.map((period) => (
         <Chip key={period.value} selected={period.value === value} onClick={() => onChange(period.value)}>
           {period.label}
@@ -136,13 +141,13 @@ function ExerciseView() {
   return (
     <div className="space-y-6">
       <label className="block space-y-2">
-        <span className="block px-1 text-sm font-semibold uppercase tracking-wider text-muted">
+        <span className="block px-1 text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-muted">
           Exercice
         </span>
         <select
           value={exerciseId ?? ''}
           onChange={(event) => setChosen(event.target.value)}
-          className="h-14 w-full rounded-2xl border border-line bg-raised px-4 text-lg font-semibold text-ink outline-none focus:border-accent"
+          className="h-14 w-full truncate rounded-2xl border border-line bg-raised px-4 text-base font-semibold text-ink outline-none focus:border-accent"
         >
           {tracked.map((exercise) => (
             <option key={exercise.exerciseId} value={exercise.exerciseId}>
@@ -238,9 +243,9 @@ function GeneralView() {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-3 gap-2">
-        <Tile label="Séances" value={String(stats.totalSessions)} detail="au total" />
-        <Tile label="Série en cours" value={String(stats.streaks.current)} detail={stats.streaks.current > 1 ? 'semaines' : 'semaine'} />
-        <Tile label="Record" value={String(stats.streaks.best)} detail={stats.streaks.best > 1 ? 'semaines' : 'semaine'} />
+        <StatTile label="Séances au total" value={String(stats.totalSessions)} />
+        <StatTile label="Semaines d’affilée" value={String(stats.streaks.current)} unit="sem." />
+        <StatTile label="Record d’affilée" value={String(stats.streaks.best)} unit="sem." />
       </div>
 
       <Section title="Séances par semaine">
@@ -302,16 +307,6 @@ function GeneralView() {
           </Card>
         </Section>
       )}
-    </div>
-  );
-}
-
-function Tile({ label, value, detail }: { label: string; value: string; detail: string }) {
-  return (
-    <div className="rounded-3xl border border-line bg-surface px-2 py-4 text-center">
-      <p className="text-xs font-semibold uppercase tracking-wider text-muted">{label}</p>
-      <p className="mt-1 text-3xl font-bold tabular-nums">{value}</p>
-      <p className="text-sm text-muted">{detail}</p>
     </div>
   );
 }

@@ -15,7 +15,7 @@ import {
   type TodayState,
 } from '../data';
 import { Button, Card, PageHeader, buttonClass } from '../ui/components';
-import { formatDuration, formatLongDay, formatPlanned, messageOf, plural } from '../ui/format';
+import { formatDuration, formatLongDay, formatPlanned, messageOf } from '../ui/format';
 import { useNow } from '../ui/hooks';
 import { IconCheck, IconChevronRight, IconShare } from '../ui/icons';
 import { ActionSheet, type SheetAction } from '../ui/overlays';
@@ -81,7 +81,7 @@ export function TodayPage() {
 
         {state && state.doneToday.length > 0 && (
           <Card className="space-y-1">
-            <p className="text-sm font-semibold uppercase tracking-wider text-muted">
+            <p className="text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-muted">
               Fait aujourd’hui
             </p>
             {state.doneToday.map((session) => (
@@ -123,7 +123,7 @@ function ActiveCard({ active, now }: { active: NonNullable<TodayState['active']>
   return (
     <Card className="space-y-3 border-accent/70">
       <div>
-        <p className="text-sm font-semibold uppercase tracking-wider text-accent">Séance en cours</p>
+        <p className="text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-accent">Séance en cours</p>
         <p className="text-3xl font-bold leading-tight">{session.workoutName}</p>
         <p className="text-muted">
           {doneSets}/{totalSets} séries · commencée il y a {formatDuration((now - session.startedAt) / 1000)}
@@ -159,12 +159,12 @@ function PlanCard({
   const { program, plan, workouts } = state;
 
   const freeButton = (
-    <Button onClick={() => onStart(null)} disabled={busy} className="min-h-12 text-base">
+    <Button onClick={() => onStart(null)} disabled={busy} className="min-h-12 whitespace-nowrap px-3 text-base">
       Séance libre
     </Button>
   );
   const chooseButton = workouts.length > 0 && (
-    <Button onClick={onChoose} disabled={busy} className="min-h-12 text-base">
+    <Button onClick={onChoose} disabled={busy} className="min-h-12 whitespace-nowrap px-3 text-base">
       {plan.kind === 'workout' ? 'Autre séance' : 'Choisir une séance'}
     </Button>
   );
@@ -184,7 +184,7 @@ function PlanCard({
   if (plan.kind === 'none') {
     return (
       <Card className="space-y-3">
-        <p className="text-sm font-semibold uppercase tracking-wider text-muted">{program.name}</p>
+        <p className="text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-muted">{program.name}</p>
         <p className="text-muted">Ce programme n’a pas encore de séance.</p>
         <Link to={programPath(program.id)} className={buttonClass('primary')}>
           Ajouter une séance
@@ -198,10 +198,10 @@ function PlanCard({
     return (
       <Card className="space-y-3">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-wider text-muted">{program.name}</p>
+          <p className="text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-muted">{program.name}</p>
           <p className="text-3xl font-bold leading-tight">Repos aujourd’hui</p>
         </div>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid auto-cols-fr grid-flow-col gap-2">
           {chooseButton}
           {freeButton}
         </div>
@@ -213,7 +213,7 @@ function PlanCard({
   return (
     <Card className="space-y-4">
       <div>
-        <p className="text-sm font-semibold uppercase tracking-wider text-muted">
+        <p className="text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-muted">
           {program.scheduleMode === 'rotation' ? 'Prochaine séance' : 'Séance du jour'} · {program.name}
         </p>
         <p className="text-3xl font-bold leading-tight">{workout.name}</p>
@@ -242,15 +242,21 @@ function PlanCard({
         </>
       )}
 
-      <div className={`grid gap-2 ${state.plannedDone || state.skipped ? 'grid-cols-2' : 'grid-cols-3'}`}>
+      {/* Deux choix secondaires côte à côte ; « passer » reste discret, sous forme de lien. */}
+      <div className="grid auto-cols-fr grid-flow-col gap-2">
         {chooseButton}
-        {!state.plannedDone && !state.skipped && (
-          <Button onClick={onSkip} disabled={busy} className="min-h-12 text-base">
-            Passer
-          </Button>
-        )}
         {freeButton}
       </div>
+      {!state.plannedDone && !state.skipped && (
+        <button
+          type="button"
+          onClick={onSkip}
+          disabled={busy}
+          className="mx-auto -mt-1 block min-h-11 px-4 text-sm font-semibold text-muted underline underline-offset-4 active:text-ink disabled:opacity-40"
+        >
+          Passer cette séance aujourd’hui
+        </button>
+      )}
     </Card>
   );
 }
@@ -263,10 +269,10 @@ function WorkoutPreview({ workout }: { workout: ProgramWorkout }) {
     return <p className="text-muted">Cette séance est vide : tu ajouteras les exercices en route.</p>;
   }
   return (
-    <ul className="space-y-1.5 border-t border-line/60 pt-3">
+    <ul className="space-y-2 border-t border-line/60 pt-3">
       {workout.items.map((item) => (
         <li key={item.id} className="flex items-baseline gap-3">
-          <span className="min-w-0 flex-1 truncate font-medium">
+          <span className="min-w-0 flex-1 font-medium leading-snug">
             {names.get(item.exerciseId) ?? 'Exercice supprimé'}
           </span>
           <span className="shrink-0 text-sm text-muted tabular-nums">
@@ -274,7 +280,6 @@ function WorkoutPreview({ workout }: { workout: ProgramWorkout }) {
           </span>
         </li>
       ))}
-      <li className="pt-1 text-sm text-muted">{plural(workout.items.length, 'exercice')}</li>
     </ul>
   );
 }

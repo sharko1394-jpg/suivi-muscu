@@ -11,7 +11,7 @@ import {
   type Goal,
   type LoadStatus,
 } from '../data';
-import { Card, PageHeader, Section } from '../ui/components';
+import { Card, PageHeader, Section, StatTile } from '../ui/components';
 import { SegmentedControl } from '../ui/controls';
 import { formatKg, formatLoad, formatNumber, formatReps, formatShortDate } from '../ui/format';
 import { IconTrendDown, IconTrendFlat, IconTrendUp } from '../ui/icons';
@@ -50,9 +50,9 @@ function Report({ report }: { report: CoachReport }) {
   return (
     <>
       <div className="grid grid-cols-3 gap-2">
-        <Tile label="Séances / sem." value={formatNumber(report.sessionsPerWeek)} />
-        <Tile
-          label="Volume / mois"
+        <StatTile label="Séances par semaine" value={formatNumber(report.sessionsPerWeek)} />
+        <StatTile
+          label="Volume du mois"
           value={
             report.volumeChange === null
               ? '—'
@@ -60,7 +60,7 @@ function Report({ report }: { report: CoachReport }) {
           }
           tone={report.volumeChange === null ? undefined : report.volumeChange >= 0 ? 'good' : 'warn'}
         />
-        <Tile label="Prêts à monter" value={String(ready)} tone={ready > 0 ? 'good' : undefined} />
+        <StatTile label="Prêts à monter" value={String(ready)} tone={ready > 0 ? 'good' : undefined} />
       </div>
 
       {report.exercises.length > 0 && (
@@ -89,21 +89,6 @@ function Report({ report }: { report: CoachReport }) {
         </Section>
       )}
     </>
-  );
-}
-
-function Tile({ label, value, tone }: { label: string; value: string; tone?: 'good' | 'warn' }) {
-  return (
-    <div className="rounded-3xl border border-line bg-surface px-2 py-4 text-center">
-      <p className="text-[0.68rem] font-semibold uppercase tracking-wider text-muted">{label}</p>
-      <p
-        className={`mt-1 text-2xl font-bold tabular-nums ${
-          tone === 'good' ? 'text-accent' : tone === 'warn' ? 'text-gold' : ''
-        }`}
-      >
-        {value}
-      </p>
-    </div>
   );
 }
 

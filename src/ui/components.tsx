@@ -4,13 +4,15 @@ import { IconChevronLeft, IconChevronRight } from './icons';
 
 // ---------- Bouton ----------
 
-type Variant = 'primary' | 'secondary' | 'danger' | 'ghost';
+type Variant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'ghostDanger';
 
 const VARIANTS: Record<Variant, string> = {
   primary: 'bg-accent text-accent-ink active:brightness-90',
   secondary: 'border border-line bg-raised text-ink active:bg-line',
   danger: 'border border-danger/50 bg-danger/10 text-danger active:bg-danger/20',
   ghost: 'text-ink active:bg-raised',
+  /** Action destructrice discrète (ex. « Abandonner la séance ») : texte rouge clair, sans fond. */
+  ghostDanger: 'text-danger active:bg-danger/10',
 };
 
 export const buttonClass = (variant: Variant = 'secondary') =>
@@ -57,18 +59,31 @@ export function PageHeader({
         )
       )}
       <div className="min-w-0 flex-1">
-        <h1 className="truncate text-2xl font-bold">{title}</h1>
-        {subtitle && <p className="truncate text-sm text-muted first-letter:uppercase">{subtitle}</p>}
+        {/* Titre court en grand ; un titre long passe un cran plus petit pour ne pas être coupé. */}
+        <h1
+          className={`truncate font-bold leading-tight tracking-tight ${
+            title.length > 16 ? 'text-2xl' : 'text-[1.75rem]'
+          }`}
+        >
+          {title}
+        </h1>
+        {subtitle && (
+          <p className="truncate text-sm font-medium text-muted first-letter:uppercase">{subtitle}</p>
+        )}
       </div>
       {action}
     </header>
   );
 }
 
+/** Titre de rubrique : petit, en capitales espacées, pour séparer sans alourdir. */
+export const sectionTitleClass =
+  'px-1 text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-muted';
+
 export function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="space-y-3">
-      <h2 className="px-1 text-sm font-semibold uppercase tracking-wider text-muted">{title}</h2>
+    <section className="space-y-2.5">
+      <h2 className={sectionTitleClass}>{title}</h2>
       {children}
     </section>
   );
@@ -77,6 +92,38 @@ export function Section({ title, children }: { title: string; children: ReactNod
 export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
     <div className={`rounded-3xl border border-line bg-surface p-4 ${className}`}>{children}</div>
+  );
+}
+
+/**
+ * Chiffre clé en tuile : le chiffre d'abord, en grand, puis ce qu'il mesure, en petit.
+ * Même présentation partout (bilan, stats, conseils), en rangées de trois.
+ */
+export function StatTile({
+  label,
+  value,
+  unit,
+  tone,
+}: {
+  label: string;
+  value: string;
+  /** Unité écrite en petit juste après le chiffre (ex. « sem. »). */
+  unit?: string;
+  tone?: 'good' | 'warn';
+}) {
+  return (
+    <div className="flex min-h-24 flex-col items-center justify-center rounded-3xl border border-line bg-surface px-2 py-3 text-center">
+      <p
+        className={`whitespace-nowrap font-bold leading-none tabular-nums ${
+          // Un chiffre long (ex. « 12 345 kg ») passe un cran plus petit pour tenir dans la tuile.
+          value.length + (unit?.length ?? 0) > 6 ? 'text-xl' : 'text-2xl'
+        } ${tone === 'good' ? 'text-accent' : tone === 'warn' ? 'text-gold' : ''}`}
+      >
+        {value}
+        {unit && <span className="ml-1 text-sm font-semibold text-muted">{unit}</span>}
+      </p>
+      <p className="mt-2 text-[0.8rem] font-medium leading-tight text-muted">{label}</p>
+    </div>
   );
 }
 

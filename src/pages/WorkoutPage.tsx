@@ -322,7 +322,7 @@ function ItemEditor({
       />
 
       <label className="block space-y-2">
-        <span className="block font-semibold">Note permanente (facultatif)</span>
+        <span className="block text-sm font-medium text-muted">Note permanente (facultatif)</span>
         <input
           type="text"
           value={note}
@@ -348,7 +348,7 @@ function ItemEditor({
       )}
 
       <div className="grid gap-2 border-t border-line/60 pt-5">
-        <Button onClick={onReplace}>Remplacer par un autre exercice</Button>
+        <Button onClick={onReplace}>Remplacer l’exercice</Button>
         <Button variant="danger" onClick={onRemove}>
           Retirer de la séance
         </Button>

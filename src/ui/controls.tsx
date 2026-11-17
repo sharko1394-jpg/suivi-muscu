@@ -3,7 +3,7 @@ import { formatNumber } from './format';
 import { IconMinus, IconMore, IconPlus } from './icons';
 
 const roundButton =
-  'flex size-13 shrink-0 items-center justify-center rounded-full border border-line bg-raised text-ink select-none active:bg-line disabled:opacity-35';
+  'flex size-12 shrink-0 items-center justify-center rounded-full border border-line bg-raised text-ink select-none active:bg-line disabled:opacity-35';
 
 // ---------- Boutons − / + ----------
 
@@ -23,9 +23,16 @@ export function Stepper({
   canDecrement?: boolean;
   canIncrement?: boolean;
 }) {
+  // Le nom en petit au-dessus de la valeur, les boutons à droite : le nom tient sur une ligne,
+  // et les boutons − et + restent alignés d'une ligne à l'autre.
   return (
     <div className="flex items-center gap-2">
-      <span className="min-w-0 flex-1 font-semibold">{label}</span>
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-medium leading-tight text-muted">{label}</p>
+        <p className="mt-0.5 whitespace-nowrap text-xl font-bold leading-snug tabular-nums" aria-live="polite">
+          {value}
+        </p>
+      </div>
       <button
         type="button"
         onClick={onDecrement}
@@ -35,9 +42,6 @@ export function Stepper({
       >
         <IconMinus />
       </button>
-      <span className="w-24 text-center text-xl font-bold tabular-nums" aria-live="polite">
-        {value}
-      </span>
       <button
         type="button"
         onClick={onIncrement}
@@ -96,7 +100,8 @@ export function WeightField({
 
   return (
     <div className="flex items-center gap-2">
-      <span className="min-w-0 flex-1 font-semibold">{label}</span>
+      {/* Même présentation que les autres réglages : le nom en petit, à gauche. */}
+      <span className="min-w-0 flex-1 text-sm font-medium leading-tight text-muted">{label}</span>
       <button
         type="button"
         onClick={() => nudge(-1)}

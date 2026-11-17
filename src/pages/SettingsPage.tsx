@@ -199,14 +199,17 @@ export function SettingsPage() {
               className="hidden"
               onChange={handleFileChosen}
             />
-
           </Card>
 
-          <Card className="space-y-3">
-            <Button onClick={handleCsv} disabled={busy || !counts || counts.sessions === 0}>
-              Exporter l’historique (CSV)
-            </Button>
-          </Card>
+          {/* Action annexe : un simple bouton discret, sans carte à lui seul. */}
+          <Button
+            variant="ghost"
+            onClick={handleCsv}
+            disabled={busy || !counts || counts.sessions === 0}
+            className="min-h-12 text-base"
+          >
+            Exporter l’historique (CSV)
+          </Button>
         </Section>
 
         {settings && (

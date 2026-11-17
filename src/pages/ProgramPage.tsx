@@ -113,7 +113,9 @@ function ProgramView({ program, workouts }: { program: Program; workouts: Progra
 
       <div className="space-y-8 p-4 pb-8">
         {program.status === 'active' && (
-          <p className="rounded-2xl border border-accent/50 bg-accent/10 px-4 py-3 font-semibold text-accent">
+          // Simple étiquette d'état : un encadré rouge ressemblait à un message d'erreur.
+          <p className="-mt-2 inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/15 px-3.5 py-1.5 text-sm font-semibold text-accent">
+            <span className="size-2 rounded-full bg-accent-bright" aria-hidden="true" />
             Programme actif
           </p>
         )}

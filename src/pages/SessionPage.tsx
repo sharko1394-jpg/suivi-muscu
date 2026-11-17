@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useRef } from 'react';
+import { useEffect, useMemo, useState, useRef, type ReactNode } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router';
 import {
   RECORD_LABELS,
@@ -315,7 +315,11 @@ function SessionScreen({
           />
         ))}
 
-        <Button onClick={() => setPicking({ mode: 'add' })}>
+        {/* Séance vide (séance libre) : ajouter un exercice est LA chose à faire, le bouton passe en rouge. */}
+        <Button
+          variant={exercises.length === 0 ? 'primary' : 'secondary'}
+          onClick={() => setPicking({ mode: 'add' })}
+        >
           <IconPlus />
           Ajouter un exercice
         </Button>
@@ -328,7 +332,7 @@ function SessionScreen({
           onChange={(note) => run(() => setSessionNote(session.id, note))}
         />
 
-        <Button variant="ghost" className="text-danger" onClick={() => setConfirm('abandon')}>
+        <Button variant="ghostDanger" onClick={() => setConfirm('abandon')}>
           Abandonner la séance
         </Button>
       </main>
@@ -678,18 +682,17 @@ function SetEditor({
     <div id={EDITOR_ID} className="scroll-mb-2 space-y-3 rounded-2xl border border-line bg-black/30 p-3">
       <p className="font-semibold">{position}</p>
 
-      {/* Type de série : un appui suffit pour noter un drop set, un superset ou un bi-set. */}
-      <div
-        className="flex flex-wrap gap-1.5"
-        role="group"
-        aria-label="Type de série"
-      >
+      {/*
+        Type de série : un appui suffit pour noter un drop set, un superset ou un bi-set.
+        Une seule ligne qu'on fait glisser, comme le RPE, au lieu de trois lignes de pastilles.
+      */}
+      <ChipRow label="Type" ariaLabel="Type de série">
         {(Object.keys(SET_TYPE_LABELS) as SetType[]).map((type) => (
           <Chip key={type} selected={set.type === type} onClick={() => onChange({ type })}>
             {SET_TYPE_LABELS[type]}
           </Chip>
         ))}
-      </div>
+      </ChipRow>
 
       <BigStepper
         label="Charge"
@@ -711,20 +714,17 @@ function SetEditor({
         onChange={(reps) => onChange({ reps })}
       />
 
-      <div className="flex items-center gap-2">
-        <span className="shrink-0 text-sm font-semibold text-muted">RPE</span>
-        <div className="no-scrollbar -mr-3 flex min-w-0 flex-1 gap-1.5 overflow-x-auto pr-3">
-          {RPE_VALUES.map((value) => (
-            <Chip
-              key={value}
-              selected={set.rpe === value}
-              onClick={() => onChange({ rpe: set.rpe === value ? null : value })}
-            >
-              {formatNumber(value)}
-            </Chip>
-          ))}
-        </div>
-      </div>
+      <ChipRow label="RPE" ariaLabel="RPE de la série">
+        {RPE_VALUES.map((value) => (
+          <Chip
+            key={value}
+            selected={set.rpe === value}
+            onClick={() => onChange({ rpe: set.rpe === value ? null : value })}
+          >
+            {formatNumber(value)}
+          </Chip>
+        ))}
+      </ChipRow>
 
       {set.done ? (
         <>
@@ -769,6 +769,25 @@ function SetEditor({
           Retirer cette série
         </button>
       )}
+    </div>
+  );
+}
+
+/**
+ * Une ligne de pastilles qu'on fait glisser du doigt, avec son étiquette à gauche.
+ * Le bord droit s'estompe pour montrer qu'il y a d'autres choix plus loin.
+ */
+function ChipRow({ label, ariaLabel, children }: { label: string; ariaLabel: string; children: ReactNode }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="w-10 shrink-0 text-sm font-semibold text-muted">{label}</span>
+      <div
+        role="group"
+        aria-label={ariaLabel}
+        className="no-scrollbar -mr-3 flex min-w-0 flex-1 gap-1.5 overflow-x-auto pr-6 [mask-image:linear-gradient(to_right,black_calc(100%-1.5rem),transparent)]"
+      >
+        {children}
+      </div>
     </div>
   );
 }
