@@ -1,9 +1,13 @@
 @import "tailwindcss";
 
 /*
- * Thème : gris anthracite très sombre, cartes gris foncé aux coins bien ronds,
+ * Thème « Défaut » (la V1) : gris anthracite très sombre, cartes gris foncé aux coins bien ronds,
  * boutons en pilule, rouge pour les actions principales, panneaux en verre dépoli
  * posés sur un fond « forge liquide » rouge animé en permanence (src/ui/LiquidBackground.tsx).
+ *
+ * Personnalisation (V2) : src/ui/theme.ts remplace ces valeurs par des variables posées sur <html>
+ * (couleur principale, teinte et opacité du verre, flou, coins, police, taille du texte).
+ * Sans personnalisation, les valeurs ci-dessous restent celles qui s'appliquent.
  */
 @theme {
   --color-bg: #121213;
@@ -79,9 +83,9 @@
 
 /* Verre dépoli : barre d'onglets, fenêtres, menus. Laisse voir le fond animé, flouté. */
 @utility glass {
-  background: rgb(44 30 32 / 0.5);
-  -webkit-backdrop-filter: blur(26px) saturate(170%);
-  backdrop-filter: blur(26px) saturate(170%);
+  background: var(--glass-bg, rgb(44 30 32 / 0.5));
+  -webkit-backdrop-filter: blur(var(--glass-blur, 26px)) saturate(170%);
+  backdrop-filter: blur(var(--glass-blur, 26px)) saturate(170%);
   border: 1px solid rgb(255 255 255 / 0.14);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.14),
@@ -97,13 +101,13 @@
 .bg-accent {
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.18),
-    0 8px 26px -8px rgb(220 30 40 / 0.75);
+    0 8px 26px -8px var(--accent-glow, rgb(220 30 40 / 0.75));
 }
 
 /* Les cartes sont aussi en verre : le flou laisse distinguer les mouvements et les couleurs derrière. */
 .bg-surface {
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--card-blur, 20px)) saturate(160%);
+  backdrop-filter: blur(var(--card-blur, 20px)) saturate(160%);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08);
 }
 
@@ -136,7 +140,62 @@
   100% { transform: translate(8vmax, -6vmax) scale(1.1) rotate(200deg); border-radius: 55% 45% 40% 60%; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .ambient-fallback span { animation: none; }
+  html:not([data-motion='full']) .ambient-fallback span { animation: none; }
+}
+
+/* Animations réduites, choisies dans la personnalisation. */
+html[data-motion='reduced'] .ambient-fallback span,
+html[data-motion='reduced'] .animate-pulse {
+  animation: none;
+}
+
+/*
+ * Réactions du fond quand il n'est pas dessiné par la carte graphique (couleur unie, dégradé, photo) :
+ * un cercle qui s'agrandit sous le doigt, doré pour un record, large à la fin du repos.
+ */
+.ambient-ring {
+  position: absolute;
+  width: 18rem;
+  height: 18rem;
+  margin: -9rem 0 0 -9rem;
+  border-radius: 9999px;
+  border: 2px solid rgb(255 255 255 / 0.45);
+  box-shadow: 0 0 40px rgb(255 255 255 / 0.18), inset 0 0 30px rgb(255 255 255 / 0.12);
+  animation: ambient-ring 1.4s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+  pointer-events: none;
+}
+.ambient-ring-gold {
+  border-color: rgb(255 214 10 / 0.8);
+  box-shadow: 0 0 60px rgb(255 200 60 / 0.45), inset 0 0 40px rgb(255 200 60 / 0.3);
+  animation-duration: 2.4s;
+  width: 40rem;
+  height: 40rem;
+  margin: -20rem 0 0 -20rem;
+}
+.ambient-ring-wide {
+  border-color: var(--color-accent-bright);
+  box-shadow: 0 0 60px var(--accent-glow, rgb(220 30 40 / 0.75));
+  animation-duration: 2s;
+  width: 40rem;
+  height: 40rem;
+  margin: -20rem 0 0 -20rem;
+}
+@keyframes ambient-ring {
+  from { transform: scale(0.05); opacity: 1; }
+  to { transform: scale(1); opacity: 0; }
+}
+/* Pendant le repos : le fond respire (6 fois par minute). */
+.ambient-breathe {
+  animation: ambient-breathe 10s ease-in-out infinite;
+}
+@keyframes ambient-breathe {
+  0%, 100% { background: rgb(0 0 0 / 0); }
+  50% { background: rgb(0 0 0 / 0.28); }
+}
+
+/* Curseurs de réglage : couleur du thème. */
+input[type='range'] {
+  accent-color: var(--color-accent-bright);
 }
 
 @utility no-scrollbar {

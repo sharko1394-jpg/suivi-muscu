@@ -1,3 +1,10 @@
+import {
+  DEFAULT_APPEARANCE,
+  normalizeAppearance,
+  normalizeSavedThemes,
+  type Appearance,
+  type SavedTheme,
+} from './appearanceModel';
 import { db, type AppDB } from './db';
 
 /** Objectif d'entraînement : oriente les conseils (fourchette de répétitions, volume par muscle). */
@@ -25,6 +32,10 @@ export interface Settings {
   skippedDay: { date: string; workoutId: string } | null;
   /** Objectif choisi dans l'onglet Conseils. */
   goal: Goal;
+  /** Personnalisation (V2) : thème, fond, onglets, widgets de l'accueil. */
+  appearance: Appearance;
+  /** Thèmes enregistrés par l'utilisateur. */
+  savedThemes: SavedTheme[];
 }
 
 export interface RestTimer {
@@ -49,15 +60,25 @@ export const DEFAULT_SETTINGS: Settings = {
   restTimer: null,
   skippedDay: null,
   goal: 'muscle',
+  appearance: DEFAULT_APPEARANCE,
+  savedThemes: [],
 };
 
+const SETTING_KEYS = Object.keys(DEFAULT_SETTINGS) as (keyof Settings)[];
+
 export async function getSettings(database: AppDB = db): Promise<Settings> {
-  const rows = await database.settings.toArray();
+  // Seulement les réglages connus : les photos de fond (lignes « fond:… ») sont lourdes
+  // et ne doivent pas être relues à chaque changement de réglage.
+  const rows = await database.settings.bulkGet(SETTING_KEYS);
   const stored: Record<string, unknown> = {};
   for (const row of rows) {
-    if (row.key in DEFAULT_SETTINGS) stored[row.key] = row.value;
+    if (row) stored[row.key] = row.value;
   }
-  return { ...DEFAULT_SETTINGS, ...(stored as Partial<Settings>) };
+  const settings = { ...DEFAULT_SETTINGS, ...(stored as Partial<Settings>) };
+  // Valeurs vérifiées : un réglage abîmé ou venu d'un vieux fichier ne doit rien casser.
+  settings.appearance = normalizeAppearance(stored.appearance);
+  settings.savedThemes = normalizeSavedThemes(stored.savedThemes);
+  return settings;
 }
 
 export async function setSetting<K extends keyof Settings>(

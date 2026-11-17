@@ -9,9 +9,12 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import { useSettings } from '../data';
+import { chartColor } from './theme';
 
-// Couleurs du thème, reprises de index.css (les graphiques ne lisent pas les classes Tailwind).
-const ACCENT = '#ff5c52';
+// Couleurs du thème (les graphiques ne lisent pas les classes Tailwind) : la courbe suit la couleur
+// principale choisie dans la personnalisation ; #ff5c52 avec le thème « Défaut ».
+const DEFAULT_ACCENT = '#ff5c52';
 const GRID = 'rgba(255,255,255,0.16)';
 const MUTED = 'rgba(235,235,245,0.62)';
 
@@ -39,6 +42,8 @@ export function TrendChart({
   title: string;
   formatValue: (value: number) => string;
 }) {
+  const settings = useSettings();
+  const ACCENT = settings ? chartColor(settings.appearance) : DEFAULT_ACCENT;
   const data = points.map((point, index) => ({ ...point, index }));
   const axis = { stroke: GRID, tick: { fill: MUTED, fontSize: 12 }, tickLine: false };
   const xAxis = (

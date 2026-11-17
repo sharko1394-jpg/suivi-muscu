@@ -1,6 +1,6 @@
 import { Suspense, lazy, useCallback, useEffect, useState } from 'react';
 import { Navigate, Route, Routes, useNavigate } from 'react-router';
-import { getActiveSession, initData } from './data';
+import { getActiveSession, getAppearance, initData } from './data';
 import { ExerciseFormPage } from './pages/ExerciseFormPage';
 import { ExercisesPage } from './pages/ExercisesPage';
 import { EditSessionPage } from './pages/EditSessionPage';
@@ -10,6 +10,14 @@ import { HistoryPage } from './pages/HistoryPage';
 // (et restent disponibles hors ligne, comme le reste).
 const StatsPage = lazy(() => import('./pages/StatsPage'));
 const CoachPage = lazy(() => import('./pages/CoachPage'));
+// Personnalisation (V2) : chargée seulement quand on l'ouvre.
+const CustomizePage = lazy(() => import('./pages/CustomizePage'));
+const CustomizeTabsPage = lazy(() =>
+  import('./pages/CustomizePage').then((module) => ({ default: module.CustomizeTabsPage })),
+);
+const CustomizeHomePage = lazy(() =>
+  import('./pages/CustomizePage').then((module) => ({ default: module.CustomizeHomePage })),
+);
 import { ProgramHome, ProgramListPage } from './pages/ProgramListPage';
 import { ProgramPage } from './pages/ProgramPage';
 import { SESSION_PATH, SessionPage } from './pages/SessionPage';
@@ -18,6 +26,7 @@ import { SummaryPage } from './pages/SummaryPage';
 import { TodayPage } from './pages/TodayPage';
 import { WorkoutPage } from './pages/WorkoutPage';
 import { AppShell } from './ui/AppShell';
+import { TAB_DEFS } from './ui/tabs';
 import { Button } from './ui/components';
 import { ToastProvider } from './ui/toast';
 
@@ -32,8 +41,14 @@ export default function App() {
     initData()
       .then(async () => {
         // Appli rouverte en pleine séance : on revient directement dessus.
+        // Sinon, on ouvre l'onglet choisi dans la personnalisation.
         const openedAtHome = ['', '#', '#/'].includes(window.location.hash);
-        if (openedAtHome && (await getActiveSession())) navigate(SESSION_PATH, { replace: true });
+        if (!openedAtHome) return;
+        if (await getActiveSession()) navigate(SESSION_PATH, { replace: true });
+        else {
+          const { tabs } = await getAppearance();
+          if (tabs.start !== 'today') navigate(TAB_DEFS[tabs.start].path, { replace: true });
+        }
       })
       .then(
         () => setBoot({ status: 'ready' }),
@@ -79,6 +94,30 @@ export default function App() {
             }
           />
           <Route path="reglages" element={<SettingsPage />} />
+          <Route
+            path="reglages/personnaliser"
+            element={
+              <Suspense fallback={null}>
+                <CustomizePage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="reglages/personnaliser/onglets"
+            element={
+              <Suspense fallback={null}>
+                <CustomizeTabsPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="reglages/personnaliser/accueil"
+            element={
+              <Suspense fallback={null}>
+                <CustomizeHomePage />
+              </Suspense>
+            }
+          />
           <Route path="reglages/exercices" element={<ExercisesPage />} />
           <Route path="reglages/exercices/nouveau" element={<ExerciseFormPage />} />
           <Route path="reglages/exercices/:id" element={<ExerciseFormPage />} />

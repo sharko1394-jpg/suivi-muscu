@@ -156,6 +156,50 @@ export const IconAlert = (p: IconProps) => (
   </Icon>
 );
 
+/** Trois blocs : les widgets de l'accueil. */
+export const IconWidgets = (p: IconProps) => (
+  <Icon {...p}>
+    <rect x="3.5" y="3.5" width="7" height="7" rx="2" />
+    <rect x="13.5" y="3.5" width="7" height="7" rx="2" />
+    <rect x="3.5" y="13.5" width="17" height="7" rx="2" />
+  </Icon>
+);
+
+/** Cadenas : élément qu'on ne peut pas retirer. */
+export const IconLock = (p: IconProps) => (
+  <Icon {...p}>
+    <rect x="5" y="11" width="14" height="9.5" rx="2" />
+    <path d="M8 11V7.5a4 4 0 0 1 8 0V11" />
+  </Icon>
+);
+
+/** Photo : fond personnel. */
+export const IconImage = (p: IconProps) => (
+  <Icon {...p}>
+    <rect x="3" y="4" width="18" height="16" rx="2.5" />
+    <circle cx="9" cy="9.5" r="1.8" />
+    <path d="m21 16-5-5-9 9" />
+  </Icon>
+);
+
+/** Crayon : renommer. */
+export const IconPencil = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M4 20h4L19 9l-4-4L4 16z" />
+    <path d="m13.5 6.5 4 4" />
+  </Icon>
+);
+
+/** Palette : personnaliser l'apparence. */
+export const IconPalette = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M12 3a9 9 0 0 0 0 18c1.4 0 2-1 2-2 0-.6-.3-1-.6-1.4-.3-.4-.6-.8-.6-1.4 0-1.1.9-2 2-2h2.2A4 4 0 0 0 21 10.2C21 6.2 17 3 12 3z" />
+    <circle cx="7.5" cy="11" r="1.2" fill="currentColor" stroke="none" />
+    <circle cx="10" cy="7" r="1.2" fill="currentColor" stroke="none" />
+    <circle cx="15" cy="7.2" r="1.2" fill="currentColor" stroke="none" />
+  </Icon>
+);
+
 export const IconShare = (p: IconProps) => (
   <Icon {...p}>
     <path d="M12 15V3.5M8 7l4-4 4 4" />

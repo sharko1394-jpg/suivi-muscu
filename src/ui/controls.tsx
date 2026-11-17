@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { formatNumber } from './format';
 import { IconMinus, IconMore, IconPlus } from './icons';
 
@@ -240,5 +240,174 @@ export function HeaderButton({
     >
       {children ?? <IconMore />}
     </button>
+  );
+}
+
+// ---------- Interrupteur seul (dans une ligne qui a déjà son nom) ----------
+
+export function Toggle({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={label}
+      onClick={() => onChange(!checked)}
+      className={`flex h-8 w-14 shrink-0 items-center rounded-full border p-0.5 transition select-none ${
+        checked ? 'justify-end border-accent bg-accent' : 'justify-start border-line bg-raised'
+      }`}
+    >
+      <span className={`size-6 rounded-full ${checked ? 'bg-accent-ink' : 'bg-muted'}`} />
+    </button>
+  );
+}
+
+// ---------- Réglages en continu (curseur, couleur) ----------
+
+/**
+ * Appelle `fn` au plus une fois tous les `ms` millisecondes, et toujours avec la dernière valeur :
+ * glisser un curseur n'enregistre pas des dizaines de fois par seconde.
+ */
+export function useThrottledCallback<T>(fn: (value: T) => void, ms: number): (value: T) => void {
+  const fnRef = useRef(fn);
+  fnRef.current = fn;
+  const last = useRef(0);
+  const timer = useRef<number | undefined>(undefined);
+  const pending = useRef<{ value: T } | null>(null);
+
+  useEffect(
+    () => () => {
+      window.clearTimeout(timer.current);
+      if (pending.current) fnRef.current(pending.current.value);
+    },
+    [],
+  );
+
+  return useCallback(
+    (value: T) => {
+      const wait = ms - (Date.now() - last.current);
+      if (wait <= 0) {
+        last.current = Date.now();
+        pending.current = null;
+        fnRef.current(value);
+        return;
+      }
+      pending.current = { value };
+      if (timer.current === undefined) {
+        timer.current = window.setTimeout(() => {
+          timer.current = undefined;
+          last.current = Date.now();
+          const next = pending.current;
+          pending.current = null;
+          if (next) fnRef.current(next.value);
+        }, wait);
+      }
+    },
+    [ms],
+  );
+}
+
+/** Curseur : la valeur suit le doigt, l'appli suit en direct. */
+export function Slider({
+  label,
+  value,
+  min,
+  max,
+  step,
+  format,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  step: number;
+  format: (value: number) => string;
+  onChange: (value: number) => void;
+}) {
+  const [draft, setDraft] = useState<number | null>(null);
+  const commit = useThrottledCallback(onChange, 120);
+  // Une fois le doigt levé, on revient à la valeur enregistrée (elle peut aussi changer ailleurs).
+  useEffect(() => {
+    if (draft === null) return;
+    const timer = window.setTimeout(() => setDraft(null), 600);
+    return () => window.clearTimeout(timer);
+  }, [draft, value]);
+  const shown = draft ?? value;
+
+  return (
+    <label className="block">
+      <span className="flex items-baseline justify-between gap-3">
+        <span className="text-sm font-medium text-muted">{label}</span>
+        <span className="font-semibold tabular-nums">{format(shown)}</span>
+      </span>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={shown}
+        onChange={(event) => {
+          const next = Number(event.target.value);
+          setDraft(next);
+          commit(next);
+        }}
+        className="mt-1 h-9 w-full"
+      />
+    </label>
+  );
+}
+
+const RAINBOW = 'conic-gradient(#ff3b30, #ffcc00, #34c759, #00c7be, #007aff, #af52de, #ff2d55, #ff3b30)';
+
+/** Pastilles de couleur, plus une pastille arc-en-ciel pour choisir n'importe quelle couleur. */
+export function ColorChoice({
+  label,
+  value,
+  swatches,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  swatches: string[];
+  onChange: (color: string) => void;
+}) {
+  const commit = useThrottledCallback(onChange, 150);
+  const custom = !swatches.includes(value);
+  const ring = 'ring-2 ring-ink ring-offset-2 ring-offset-bg';
+  return (
+    <div role="group" aria-label={label} className="flex flex-wrap gap-3">
+      {swatches.map((color) => (
+        <button
+          key={color}
+          type="button"
+          aria-label={`Couleur ${color}`}
+          aria-pressed={value === color}
+          onClick={() => onChange(color)}
+          className={`size-10 rounded-full border border-white/20 ${value === color ? ring : ''}`}
+          style={{ background: color }}
+        />
+      ))}
+      <label
+        className={`relative size-10 overflow-hidden rounded-full border border-white/20 ${custom ? ring : ''}`}
+        style={{ background: custom ? value : RAINBOW }}
+      >
+        <span className="sr-only">Autre couleur</span>
+        <input
+          type="color"
+          value={value}
+          onChange={(event) => commit(event.target.value.toLowerCase())}
+          className="absolute inset-0 size-full cursor-pointer opacity-0"
+        />
+      </label>
+    </div>
   );
 }

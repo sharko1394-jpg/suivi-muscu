@@ -35,12 +35,29 @@ données : ce que tu saisis dans l'une n'apparaît pas dans l'autre.
 - Dans **Réglages → Mes données**, la ligne « Protection contre l'effacement automatique » doit
   indiquer « Activée ». Si ce n'est pas le cas, touche « Redemander ».
 
+## Personnaliser l'appli
+
+Tout se règle dans **Réglages → Personnaliser l'appli**, et s'applique tout de suite :
+
+- **Thèmes** : touche un thème pour l'essayer. « Défaut » remet l'apparence d'origine.
+  « Enregistrer » garde ta création dans « Mes thèmes ».
+- **Couleur principale**, **fond** (animé, uni, dégradé ou **ta propre photo**), **cartes**
+  (opacité, flou, coins), **texte** (police, taille) et **animations**.
+- **Onglets** : glisse les lignes par leur poignée pour changer l'ordre, masque ceux qui ne te
+  servent pas, touche un nom pour le changer, et choisis l'onglet qui s'ouvre au lancement.
+- **Accueil** : ajoute, retire, déplace des widgets et choisis leur taille (petit ou grand).
+  Le bouton en haut à droite de l'écran « Aujourd'hui » y mène directement.
+- **Partager** : « Exporter » crée un fichier avec toute ta personnalisation (et ta photo de fond),
+  à garder ou à envoyer ; « Importer » l'applique sur un autre téléphone.
+
+Les photos de fond restent sur le téléphone et partent dans tes sauvegardes.
+
 ## Mettre à jour l'appli
 
 Les mises à jour ne touchent jamais aux données : elles ne remplacent que l'appli elle-même.
 
 1. Ouvre l'appli avec du réseau.
-2. Un bandeau vert **« Mise à jour disponible »** apparaît en bas de l'écran. Touche
+2. Un bandeau **« Mise à jour disponible »** apparaît en bas de l'écran. Touche
    **« Mettre à jour »** : l'appli se recharge dans sa nouvelle version.
 3. Si le bandeau ne vient pas, va dans **Réglages → À propos** et touche
    **« Rechercher une mise à jour »**. Tu peux aussi fermer complètement l'appli et la rouvrir.

@@ -14,6 +14,7 @@ import {
   parseBackup,
   requestPersistence,
   setSetting,
+  themeName,
   useBackupDue,
   useDataCounts,
   useSettings,
@@ -168,6 +169,14 @@ export function SettingsPage() {
     <>
       <PageHeader title="Réglages" />
       <div className="space-y-8 p-4 pb-8">
+        <Section title="Apparence">
+          <LinkRow
+            to="/reglages/personnaliser"
+            title="Personnaliser l’appli"
+            detail={settings ? `Thème : ${themeName(settings.appearance, settings.savedThemes)}` : undefined}
+          />
+        </Section>
+
         <Section title="Sauvegarde">
           <Card className="space-y-4">
             <div>

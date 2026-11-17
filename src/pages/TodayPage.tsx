@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import {
   BACKUP_REMINDER_DAYS,
+  DEFAULT_HOME,
   getTodayState,
   listExercises,
   localDate,
@@ -11,19 +12,26 @@ import {
   unskipToday,
   useBackupDue,
   useLive,
+  useSettings,
   type ProgramWorkout,
   type TodayState,
+  type WidgetSlot,
 } from '../data';
 import { Button, Card, PageHeader, buttonClass } from '../ui/components';
+import { HeaderButton } from '../ui/controls';
 import { formatDuration, formatLongDay, formatPlanned, messageOf } from '../ui/format';
 import { useNow } from '../ui/hooks';
-import { IconCheck, IconChevronRight, IconShare } from '../ui/icons';
+import { IconCheck, IconChevronRight, IconShare, IconWidgets } from '../ui/icons';
 import { ActionSheet, type SheetAction } from '../ui/overlays';
 import { isIOS, isStandalone } from '../ui/platform';
 import { unlockAudio } from '../ui/sound';
 import { useToast } from '../ui/toast';
 import { PROGRAM_LIST, programPath } from './ProgramListPage';
 import { SESSION_PATH, summaryPath } from './SessionPage';
+import { DataWidget } from './widgets';
+
+/** Page où l'on choisit les widgets de l'accueil. */
+export const HOME_EDITOR_PATH = '/reglages/personnaliser/accueil';
 
 export function TodayPage() {
   const navigate = useNavigate();
@@ -32,6 +40,7 @@ export function TodayPage() {
   const now = useNow(60_000);
   // Relu à chaque changement de données, et au passage de minuit.
   const state = useLive(() => getTodayState(), [localDate(now)]);
+  const home = useSettings()?.appearance.home ?? DEFAULT_HOME;
   const [choosing, setChoosing] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -60,49 +69,79 @@ export function TodayPage() {
     { label: 'Séance libre', onSelect: () => start(null) },
   ];
 
+  /** Contenu d'un emplacement de l'accueil ; null = rien à montrer (le cadre disparaît). */
+  function slotContent(slot: WidgetSlot) {
+    if (!state) return null;
+    if (slot.id === 'plan') {
+      return state.active ? (
+        <ActiveCard active={state.active} now={now} />
+      ) : (
+        <PlanCard
+          state={state}
+          busy={busy}
+          onStart={start}
+          onChoose={() => setChoosing(true)}
+          onSkip={() => run(() => skipPlannedWorkout())}
+          onUnskip={() => run(() => unskipToday())}
+        />
+      );
+    }
+    if (slot.id === 'doneToday') {
+      if (state.doneToday.length === 0) return null;
+      return (
+        <Card className="space-y-1">
+          <p className="text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-muted">
+            Fait aujourd’hui
+          </p>
+          {state.doneToday.map((session) => (
+            <Link
+              key={session.id}
+              to={summaryPath(session.id)}
+              className="-mx-2 flex min-h-13 items-center gap-3 rounded-2xl px-2 active:bg-raised"
+            >
+              <IconCheck className="shrink-0 text-accent" />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-lg font-semibold">{session.workoutName}</span>
+                <span className="block text-sm text-muted">
+                  {formatDuration(((session.endedAt ?? session.startedAt) - session.startedAt) / 1000)} ·
+                  voir le bilan
+                </span>
+              </span>
+              <IconChevronRight className="shrink-0 text-muted" />
+            </Link>
+          ))}
+        </Card>
+      );
+    }
+    return <DataWidget id={slot.id} size={slot.size} now={now} />;
+  }
+
   return (
     <>
-      <PageHeader title="Aujourd’hui" subtitle={formatLongDay(now)} />
+      <PageHeader
+        title="Aujourd’hui"
+        subtitle={formatLongDay(now)}
+        action={
+          <HeaderButton label="Organiser l’accueil" onClick={() => navigate(HOME_EDITOR_PATH)}>
+            <IconWidgets />
+          </HeaderButton>
+        }
+      />
       <div className="space-y-4 p-4 pb-8">
         {backupDue && <BackupReminder />}
 
-        {state?.active && <ActiveCard active={state.active} now={now} />}
-
-        {state && !state.active && (
-          <PlanCard
-            state={state}
-            busy={busy}
-            onStart={start}
-            onChoose={() => setChoosing(true)}
-            onSkip={() => run(() => skipPlannedWorkout())}
-            onUnskip={() => run(() => unskipToday())}
-          />
-        )}
-
-        {state && state.doneToday.length > 0 && (
-          <Card className="space-y-1">
-            <p className="text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-muted">
-              Fait aujourd’hui
-            </p>
-            {state.doneToday.map((session) => (
-              <Link
-                key={session.id}
-                to={summaryPath(session.id)}
-                className="-mx-2 flex min-h-13 items-center gap-3 rounded-2xl px-2 active:bg-raised"
-              >
-                <IconCheck className="shrink-0 text-accent" />
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-lg font-semibold">{session.workoutName}</span>
-                  <span className="block text-sm text-muted">
-                    {formatDuration(((session.endedAt ?? session.startedAt) - session.startedAt) / 1000)} ·
-                    voir le bilan
-                  </span>
-                </span>
-                <IconChevronRight className="shrink-0 text-muted" />
-              </Link>
-            ))}
-          </Card>
-        )}
+        {/* Emplacements choisis dans la personnalisation : petits (demi-largeur) ou grands. */}
+        <div className="grid grid-cols-2 gap-4">
+          {home.map((slot) => {
+            const content = slotContent(slot);
+            if (!content) return null;
+            return (
+              <div key={slot.id} className={`min-w-0 ${slot.size === 'large' ? 'col-span-2' : ''}`}>
+                {content}
+              </div>
+            );
+          })}
+        </div>
 
         {!isStandalone() && <InstallHint />}
       </div>

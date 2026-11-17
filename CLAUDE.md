@@ -31,6 +31,14 @@ sur iPhone. Le cahier des charges complet est dans `docs/cahier-des-charges.md` 
   Ne pas la nommer `DataError` : Dexie réserve ce nom et l'emballerait.
 - Aucun backend, aucun compte, aucune donnée envoyée ailleurs. Pas de localStorage pour les données.
 - L'adresse du site ne doit jamais changer : ne renommer ni le dépôt ni le compte GitHub.
+- Personnalisation (V2) : tout vit dans le tiroir `settings` (réglages `appearance` et `savedThemes`,
+  une ligne `fond:<id>` par photo de fond). La forme de la base ne change pas (toujours la version 1) :
+  la V1 (étiquette `v1-final`) peut toujours rouvrir les données. `getSettings` ne lit que les clés
+  connues (`bulkGet`), jamais les photos. Valeurs toujours passées par `normalizeAppearance`.
+- Le thème « Défaut » reproduit exactement la V1 (`DEFAULT_APPEARANCE`, fond `forge`, testé) : ne pas
+  modifier ses valeurs. Ne jamais changer la signature des fichiers de thème (`THEME_FILE_APP`).
+- La séance du jour (widget `plan`) reste toujours sur l'accueil, Aujourd'hui et Réglages restent
+  toujours dans les onglets : sans eux, impossible de démarrer une séance ou de revenir en arrière.
 
 ## Façon de travailler
 
@@ -99,6 +107,25 @@ Les données de l'utilisateur sont attachées à cette adresse.
 - Types de série : normale, échauffement, drop set, superset, bi-set, échec. Superset et bi-set
   notés sur une série sont de simples étiquettes : ils ne changent pas le minuteur de repos.
 
+## Personnalisation (V2, Réglages → Personnaliser l'appli)
+
+- Données : `src/data/appearanceModel.ts` (types, thèmes prêts à l'emploi, vérification des valeurs),
+  `src/data/appearance.ts` (enregistrement, mes thèmes, photos, fichiers de thème),
+  `src/data/dashboard.ts` (données des widgets).
+- Affichage : `src/ui/theme.ts` pose des variables CSS sur `<html>` (`--color-accent`, verre, flou,
+  rayons Tailwind `--radius-*`, police, taille du texte) ; `src/ui/Ambience.tsx` (monté dans
+  `main.tsx`) les applique et passe le fond à `LiquidBackground` (mêmes formes, palette en paramètre :
+  Forge, Océan, Aurore, Émeraude, Crépuscule, Graphite, Or ; ou couleur unie, dégradé, photo).
+- Thème = couleur principale, fond, opacité et flou du verre, coins, police. La taille du texte, les
+  animations, les onglets et l'accueil n'en font pas partie.
+- Onglets : ordre, masquer (sauf Aujourd'hui et Réglages), renommer, noms (actif / tous / aucun),
+  barre flottante ou pleine largeur, onglet d'ouverture. Définitions dans `src/ui/tabs.tsx`.
+- Accueil : widgets petits (demi-largeur) ou grands (`src/pages/widgets.tsx`) : séance du jour,
+  fait aujourd'hui, cette semaine, dernière séance, prêts à monter, records récents, prochain record,
+  poids de corps, séries de la semaine.
+- Photos : réduites sur le téléphone (1800 px, JPEG), 8 au plus, incluses dans les sauvegardes.
+  Fichier de personnalisation partageable (.json) avec la photo affichée.
+
 ## Avancement
 
 1. Données et sauvegarde : fait (avec la base PWA : installation, hors ligne, bandeau de mise à jour)
@@ -118,6 +145,8 @@ Les données de l'utilisateur sont attachées à cette adresse.
 
 7. Conseils : fait (version 1.2.0).
 8. Lisibilité (hiérarchie, espacements, gris plus clair) et séance libre réparée : fait (version 1.2.1).
+   **V1 finale** : étiquette git `v1-final` (commit 3d0ea87).
+9. Personnalisation complète (V2) : fait (version 2.0.0).
 
 ## Commandes
 
