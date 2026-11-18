@@ -190,6 +190,14 @@ Les données de l'utilisateur sont attachées à cette adresse.
   `rotationPerWeek` (séances par semaine). Semaine en 7 tuiles, muscles sous chaque séance,
   lignes d'exercice courtes (séries × répétitions · muscle).
 
+## Motifs (2.4)
+
+- Les 5 fonds en lignes sont des **motifs**, à part du thème (`motif` dans l'apparence, hors `Look`) :
+  rubrique « Motif » de Personnaliser. Un motif remplace le fond et prend les couleurs du thème
+  (`displayedBackground` dans `src/ui/theme.ts` : lignes = couleur principale claire, fond très
+  sombre teinté) ; changer de thème le garde et le recolore. Un fond `kind: 'pattern'` de la 2.3
+  est converti en motif à la lecture (`normalizeAppearance`). Plus de thème « Topo ».
+
 ## Avancement
 
 1. Données et sauvegarde : fait (avec la base PWA : installation, hors ligne, bandeau de mise à jour)
@@ -217,6 +225,7 @@ Les données de l'utilisateur sont attachées à cette adresse.
     onglets : fait (version 2.2.0).
 12. Fonds en lignes animés et créateur de programme plus clair, avec le volume par muscle : fait
     (version 2.3.0).
+13. Motifs à part du thème, aux couleurs du thème : fait (version 2.4.0).
 
 ## Commandes
 

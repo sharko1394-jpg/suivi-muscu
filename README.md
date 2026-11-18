@@ -87,7 +87,7 @@ Tout se règle dans **Réglages → Personnaliser l'appli**, et s'applique tout 
 
 - **Thèmes** : touche un thème pour l'essayer. « Défaut » remet l'apparence d'origine.
   « Enregistrer » garde ta création dans « Mes thèmes ».
-- **Couleur principale**, **fond** (animé, en lignes comme une carte topographique, uni, dégradé ou **ta propre photo**), **cartes**
+- **Couleur principale**, **fond** (animé, uni, dégradé ou **ta propre photo**), **motif** (lignes de niveau, ondes, grille, trame, verre cannelé : il prend les couleurs du thème), **cartes**
   (opacité, flou, coins), **texte** (police, taille) et **animations**.
 - **Ta photo en fond** : dans **Fond**, touche la première vignette **« Galerie »**, puis
   **« Photothèque »** dans le menu de l'iPhone, et choisis ta photo.

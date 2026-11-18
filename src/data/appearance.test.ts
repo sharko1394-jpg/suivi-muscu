@@ -226,6 +226,16 @@ describe('changer l’apparence', () => {
     database.close();
   });
 
+  it('changer de thème garde le motif (il prend les nouvelles couleurs)', async () => {
+    const database = await freshDb();
+    await updateAppearance({ motif: 'grid' }, database);
+    await applyLook(THEME_PRESETS.find((t) => t.id === 'or')!.look, database);
+    const appearance = await getAppearance(database);
+    expect(appearance.motif).toBe('grid');
+    expect(appearance.background.preset).toBe('gold');
+    database.close();
+  });
+
   it('« par défaut » remet la V1, mais garde mes photos et mes thèmes', async () => {
     const database = await freshDb();
     await addCustomBackground(photo(), database);

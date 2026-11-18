@@ -1,7 +1,7 @@
 import { Component, useLayoutEffect, useMemo, type ReactNode } from 'react';
 import { DEFAULT_APPEARANCE, getAppearance, getCustomBackground, useLive } from '../data';
 import { LiquidBackground, type AmbientConfig } from './LiquidBackground';
-import { applyAppearance } from './theme';
+import { applyAppearance, displayedBackground } from './theme';
 
 /**
  * Habillage de l'appli : applique la personnalisation (couleurs, verre, police…) à toute la page
@@ -25,7 +25,9 @@ function AmbienceInner() {
     }
   }, []);
 
-  const imageId = appearance?.background.kind === 'image' ? appearance.background.imageId : null;
+  // Fond dessiné : le motif (aux couleurs du thème) s'il y en a un, sinon le fond du thème.
+  const shown = useMemo(() => (appearance ? displayedBackground(appearance) : null), [appearance]);
+  const imageId = shown?.kind === 'image' ? shown.imageId : null;
   const image = useLive(async () => {
     if (!imageId) return { id: null, url: null };
     try {
@@ -41,20 +43,20 @@ function AmbienceInner() {
 
   const config = useMemo<AmbientConfig>(() => {
     const imageReady = imageId === null || image?.id === imageId;
-    if (!appearance || !imageReady) {
+    if (!appearance || !shown || !imageReady) {
       return { background: null, imageUrl: null, motion: 'auto', effects: DEFAULT_APPEARANCE.effects };
     }
     const background =
-      appearance.background.kind === 'image' && !image?.url
-        ? { ...appearance.background, kind: 'animated' as const } // photo introuvable : fond animé
-        : appearance.background;
+      shown.kind === 'image' && !image?.url
+        ? { ...shown, kind: 'animated' as const } // photo introuvable : fond animé
+        : shown;
     return {
       background,
       imageUrl: image?.url ?? null,
       motion: appearance.motion,
       effects: appearance.effects,
     };
-  }, [appearance, image, imageId]);
+  }, [appearance, shown, image, imageId]);
 
   return <LiquidBackground config={config} />;
 }

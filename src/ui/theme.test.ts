@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_APPEARANCE, THEME_PRESETS, normalizeAppearance, themeName } from '../data';
-import { appearanceVars, brightAccent, inkOn } from './theme';
+import { appearanceVars, brightAccent, displayedBackground, inkOn } from './theme';
 
 describe('variables CSS du thème', () => {
   it('« Défaut » donne exactement les valeurs de la V1', () => {
@@ -48,5 +48,24 @@ describe('nom du thème affiché', () => {
     const mine = normalizeAppearance({ accent: '#123456' });
     expect(themeName(mine, [])).toBe('Personnalisé');
     expect(themeName(mine, [{ id: 't1', name: 'Bleu nuit', look: mine, createdAt: 0 }])).toBe('Bleu nuit');
+  });
+});
+
+describe('motif (2.4)', () => {
+  it('sans motif, le fond du thème ; avec un motif, des lignes de la couleur du thème', () => {
+    expect(displayedBackground(DEFAULT_APPEARANCE)).toBe(DEFAULT_APPEARANCE.background);
+    const red = displayedBackground({ ...DEFAULT_APPEARANCE, motif: 'contours' });
+    expect(red).toMatchObject({ kind: 'pattern', pattern: 'contours', patternLine: '#ff5c52' });
+    const ocean = THEME_PRESETS.find((t) => t.id === 'ocean')!.look;
+    const blue = displayedBackground({ ...DEFAULT_APPEARANCE, ...ocean, motif: 'contours' });
+    expect(blue.patternLine).toBe(brightAccent(ocean.accent));
+    expect(blue.patternBg).not.toBe(red.patternBg);
+  });
+
+  it('un fond en lignes de la 2.3 devient le motif, et le fond redevient animé', () => {
+    const fixed = normalizeAppearance({ background: { kind: 'pattern', pattern: 'waves', preset: 'ocean' } });
+    expect(fixed.motif).toBe('waves');
+    expect(fixed.background).toMatchObject({ kind: 'animated', preset: 'ocean' });
+    expect(normalizeAppearance({ motif: 'inconnu' }).motif).toBeNull();
   });
 });

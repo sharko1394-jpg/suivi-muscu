@@ -64,7 +64,7 @@ import { dataUrlToFile, isImageFile, prepareBackgroundImage } from '../ui/imageT
 import { ActionSheet, PromptDialog } from '../ui/overlays';
 import { saveFile } from '../ui/platform';
 import { TAB_DEFS, tabLabel } from '../ui/tabs';
-import { FONT_STACKS, flatBackground, presetPreview, tintFor } from '../ui/theme';
+import { FONT_STACKS, displayedBackground, flatBackground, presetPreview, tintFor } from '../ui/theme';
 import { useToast } from '../ui/toast';
 import { HOME_EDITOR_PATH } from './TodayPage';
 
@@ -137,8 +137,6 @@ function useBack(fallback: string) {
   };
 }
 
-/** Couleurs de lignes proposées pour les fonds en lignes. */
-const LINE_SWATCHES = ['#c9e265', '#5fb4ff', '#ff5c52', '#c084fc', '#ff6b4a', '#ffd60a', '#34d399', '#e4e4e7'];
 
 /** Petite image fixe (en CSS) qui évoque un fond en lignes. */
 function patternPreview(def: PatternDef, bg: string, line: string): string {
@@ -392,6 +390,9 @@ export default function CustomizePage() {
         </Section>
 
         <Section title="Fond">
+          {appearance.motif && (
+            <p className="px-1 text-sm text-muted">Un motif est choisi : il s’affiche à la place du fond.</p>
+          )}
           <TileRow label="Fond">
             {/* En premier, pour être vu tout de suite : une photo de la galerie du téléphone. */}
             <AddTile
@@ -426,30 +427,6 @@ export default function CustomizePage() {
                 />
               </Tile>
             ))}
-            {PATTERNS.map((def) => {
-              const selected = background.kind === 'pattern' && background.pattern === def.id;
-              return (
-                <Tile
-                  key={def.id}
-                  label={def.label}
-                  selected={selected}
-                  onClick={() =>
-                    setBackground(
-                      selected ? {} : { kind: 'pattern', pattern: def.id, patternBg: def.bg, patternLine: def.line },
-                    )
-                  }
-                >
-                  <span
-                    className="block h-28 rounded-2xl border border-white/10"
-                    style={{
-                      background: selected
-                        ? patternPreview(def, background.patternBg, background.patternLine)
-                        : patternPreview(def, def.bg, def.line),
-                    }}
-                  />
-                </Tile>
-              );
-            })}
             <Tile label="Uni" selected={background.kind === 'solid'} onClick={() => setBackground({ kind: 'solid' })}>
               <span className="block h-28 rounded-2xl border border-white/10" style={{ background: background.color }} />
             </Tile>
@@ -466,7 +443,7 @@ export default function CustomizePage() {
           </TileRow>
 
           <Card className="space-y-5">
-            {(background.kind === 'animated' || background.kind === 'pattern') && (
+            {background.kind === 'animated' && !appearance.motif && (
               <>
                 <Slider
                   label="Vitesse"
@@ -486,28 +463,6 @@ export default function CustomizePage() {
                   format={(v) => `${Math.round(v * 100)} %`}
                   onChange={(intensity) => setBackground({ intensity })}
                 />
-              </>
-            )}
-            {background.kind === 'pattern' && (
-              <>
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-muted">Lignes</p>
-                  <ColorChoice
-                    label="Couleur des lignes"
-                    value={background.patternLine}
-                    swatches={LINE_SWATCHES}
-                    onChange={(patternLine) => setBackground({ patternLine })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-muted">Fond</p>
-                  <ColorChoice
-                    label="Couleur du fond"
-                    value={background.patternBg}
-                    swatches={BACKGROUND_SWATCHES}
-                    onChange={(patternBg) => setBackground({ patternBg })}
-                  />
-                </div>
               </>
             )}
             {background.kind === 'solid' && (
@@ -563,6 +518,53 @@ export default function CustomizePage() {
               </>
             )}
           </Card>
+        </Section>
+
+        <Section title="Motif">
+          <TileRow label="Motif">
+            <Tile label="Aucun" selected={appearance.motif === null} onClick={() => set({ motif: null })}>
+              <span
+                className="flex h-28 items-center justify-center rounded-2xl border border-white/10 text-sm font-semibold text-muted"
+                style={{ background: backgroundPreview(background, images) }}
+              >
+                Fond du thème
+              </span>
+            </Tile>
+            {PATTERNS.map((def) => {
+              // Aperçu aux couleurs du thème actuel : c'est ainsi qu'il s'affichera.
+              const colors = displayedBackground({ ...appearance, motif: def.id });
+              return (
+                <Tile key={def.id} label={def.label} selected={appearance.motif === def.id} onClick={() => set({ motif: def.id })}>
+                  <span
+                    className="block h-28 rounded-2xl border border-white/10"
+                    style={{ background: patternPreview(def, colors.patternBg, colors.patternLine) }}
+                  />
+                </Tile>
+              );
+            })}
+          </TileRow>
+          {appearance.motif && (
+            <Card className="space-y-5">
+              <Slider
+                label="Vitesse"
+                value={background.speed}
+                min={BACKGROUND_LIMITS.speed.min}
+                max={BACKGROUND_LIMITS.speed.max}
+                step={0.05}
+                format={(v) => `× ${formatNumber(Math.round(v * 100) / 100)}`}
+                onChange={(speed) => setBackground({ speed })}
+              />
+              <Slider
+                label="Luminosité"
+                value={background.intensity}
+                min={BACKGROUND_LIMITS.intensity.min}
+                max={BACKGROUND_LIMITS.intensity.max}
+                step={0.05}
+                format={(v) => `${Math.round(v * 100)} %`}
+                onChange={(intensity) => setBackground({ intensity })}
+              />
+            </Card>
+          )}
         </Section>
 
         <Section title="Cartes">

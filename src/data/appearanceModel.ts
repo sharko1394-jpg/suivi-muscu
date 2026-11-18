@@ -392,6 +392,11 @@ export interface Appearance extends Look {
   home: WidgetSlot[];
   /** Version de l'accueil enregistré : un widget de base ajouté depuis n'y entre qu'une seule fois. */
   homeVersion: number;
+  /**
+   * Motif en lignes (2.4) : il remplace le fond et prend les couleurs du thème.
+   * Il ne fait pas partie du thème : changer de thème le garde, et le recolore.
+   */
+  motif: PatternId | null;
 }
 
 export const DEFAULT_BACKGROUND: BackgroundSettings = {
@@ -458,6 +463,7 @@ export const DEFAULT_APPEARANCE: Appearance = {
   tabs: DEFAULT_TABS,
   home: DEFAULT_HOME,
   homeVersion: HOME_VERSION,
+  motif: null,
 };
 
 /** Couleurs principales proposées d'un appui (on peut aussi choisir n'importe quelle couleur). */
@@ -499,11 +505,6 @@ export const THEME_PRESETS: ThemePreset[] = [
   { id: 'crepuscule', label: 'Crépuscule', look: presetLook('sunset') },
   { id: 'graphite', label: 'Graphite', look: presetLook('graphite', { font: 'system', corners: 'soft' }) },
   { id: 'or', label: 'Or', look: presetLook('gold', { corners: 'xl' }) },
-  {
-    id: 'topo',
-    label: 'Topo',
-    look: { ...DEFAULT_LOOK, accent: '#7f9f2e', background: { ...DEFAULT_BACKGROUND, kind: 'pattern', pattern: 'contours' } },
-  },
 ];
 
 // ---------- Thèmes de l'utilisateur et photos ----------
@@ -669,8 +670,17 @@ export function normalizeAppearance(raw: unknown): Appearance {
   // Accueil enregistré avant la version 2 : pas de numéro de version.
   const homeVersion =
     typeof r.homeVersion === 'number' && Number.isInteger(r.homeVersion) ? Math.min(Math.max(1, r.homeVersion), HOME_VERSION) : 1;
+  const look = normalizeLook(r);
+  let motif: PatternId | null = PATTERN_IDS.find((id) => id === r.motif) ?? null;
+  // 2.3 : les motifs étaient des fonds. Un fond en lignes devient le motif, et le fond redevient
+  // le fond animé : le motif suit désormais les couleurs du thème.
+  if (look.background.kind === 'pattern') {
+    motif = motif ?? look.background.pattern;
+    look.background = { ...look.background, kind: 'animated' };
+  }
   return {
-    ...normalizeLook(r),
+    ...look,
+    motif,
     textSize: oneOf(r.textSize, TEXT_SIZES, DEFAULT_APPEARANCE.textSize),
     motion: oneOf(r.motion, MOTIONS, DEFAULT_APPEARANCE.motion),
     effects: {

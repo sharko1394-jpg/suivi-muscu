@@ -121,6 +121,23 @@ export function tintFor(background: BackgroundSettings): Tint {
   };
 }
 
+/**
+ * Fond réellement dessiné : le motif choisi, aux couleurs du thème (fond très sombre teinté par la
+ * couleur principale, lignes de la couleur principale), sinon le fond du thème.
+ */
+export function displayedBackground(appearance: Pick<Appearance, 'background' | 'accent' | 'motif'>): BackgroundSettings {
+  if (!appearance.motif) return appearance.background;
+  const base = hexToRgb(tintFor(appearance.background).base);
+  const dark = mix(mix(base, [6, 6, 8], 0.35), hexToRgb(appearance.accent), 0.1);
+  return {
+    ...appearance.background,
+    kind: 'pattern',
+    pattern: appearance.motif,
+    patternBg: rgbToHex(dark),
+    patternLine: brightAccent(appearance.accent),
+  };
+}
+
 // ---------- Coins, police, taille du texte ----------
 
 /** Rayons des coins (variables de Tailwind) : ronds = la V1. */
@@ -151,7 +168,7 @@ const TEXT_SCALE: Record<TextSize, string> = {
 export function appearanceVars(appearance: Appearance): Record<string, string> {
   const accent = appearance.accent;
   const bright = brightAccent(accent);
-  const tint = tintFor(appearance.background);
+  const tint = tintFor(displayedBackground(appearance));
   const glow =
     accent === DEFAULT_LOOK.accent
       ? 'rgb(220 30 40 / 0.75)' // la V1
@@ -185,7 +202,7 @@ export function applyAppearance(appearance: Appearance): void {
   if (root.style.fontSize !== size) root.style.fontSize = size;
   root.dataset.motion = appearance.motion;
   // Barre d'état et fond de l'appli sur iPhone : même teinte que la page.
-  const base = tintFor(appearance.background).base;
+  const base = tintFor(displayedBackground(appearance)).base;
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', base);
 }
 
