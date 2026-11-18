@@ -178,6 +178,18 @@ Les données de l'utilisateur sont attachées à cette adresse.
   horizontal ; ignoré dans les champs, fenêtres, graphiques (`data-no-swipe`) et tout ce qui défile
   de côté.
 
+## Fonds en lignes et créateur de programme (2.3)
+
+- Fonds en lignes (`src/ui/PatternBackground.tsx`, WebGL, deux couleurs) : lignes de niveau, ondes,
+  grille, trame, verre cannelé. Réglages `kind: 'pattern'`, `pattern`, `patternBg`, `patternLine`
+  dans `background` (vitesse et luminosité partagées avec le fond animé). Thème prêt « Topo ».
+  Pas de `loseContext()` au démontage : en développement, React remonte le composant sur le même canvas.
+- Créateur de programme : « Séries par semaine » par groupe musculaire (`src/data/programVolume.ts`,
+  principal 1, secondaire ½, zone de l'objectif de Conseils) en haut du programme et dépliable dans
+  chaque séance ; jours fixes = nombre de jours où la séance est placée ; rotation = réglage
+  `rotationPerWeek` (séances par semaine). Semaine en 7 tuiles, muscles sous chaque séance,
+  lignes d'exercice courtes (séries × répétitions · muscle).
+
 ## Avancement
 
 1. Données et sauvegarde : fait (avec la base PWA : installation, hors ligne, bandeau de mise à jour)
@@ -203,6 +215,8 @@ Les données de l'utilisateur sont attachées à cette adresse.
     Bibliothèque : fait (version 2.1.0). Les dessins animés restent à affiner au fil des retours.
 11. Profil, onglet Nutrition (dépense, repas, sèche / maintien / prise de masse) et swipe entre
     onglets : fait (version 2.2.0).
+12. Fonds en lignes animés et créateur de programme plus clair, avec le volume par muscle : fait
+    (version 2.3.0).
 
 ## Commandes
 

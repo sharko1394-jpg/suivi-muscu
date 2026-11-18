@@ -29,6 +29,7 @@ export * from './exerciseGuide';
 export * from './energy';
 export * from './foods';
 export * from './nutrition';
+export * from './programVolume';
 export * from './appearanceModel';
 export * from './appearance';
 export * from './settings';

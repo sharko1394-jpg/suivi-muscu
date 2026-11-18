@@ -5,6 +5,8 @@ import {
   ANIMATED_PRESETS,
   AppError,
   ANIMATED_PRESET_IDS,
+  PATTERNS,
+  type PatternDef,
   BACKGROUND_LIMITS,
   CORNERS,
   DEFAULT_HOME,
@@ -135,10 +137,33 @@ function useBack(fallback: string) {
   };
 }
 
+/** Couleurs de lignes proposées pour les fonds en lignes. */
+const LINE_SWATCHES = ['#c9e265', '#5fb4ff', '#ff5c52', '#c084fc', '#ff6b4a', '#ffd60a', '#34d399', '#e4e4e7'];
+
+/** Petite image fixe (en CSS) qui évoque un fond en lignes. */
+function patternPreview(def: PatternDef, bg: string, line: string): string {
+  switch (def.id) {
+    case 'contours':
+      return `repeating-radial-gradient(ellipse at 30% 40%, transparent 0 7px, ${line} 7px 8px), repeating-radial-gradient(ellipse at 85% 85%, transparent 0 9px, ${line}99 9px 10px), ${bg}`;
+    case 'waves':
+      return `repeating-linear-gradient(170deg, transparent 0 7px, ${line} 7px 8px), ${bg}`;
+    case 'grid':
+      return `linear-gradient(${line}88 1px, transparent 1px) 0 0 / 14px 14px, linear-gradient(90deg, ${line}88 1px, transparent 1px) 0 0 / 14px 14px, ${bg}`;
+    case 'dots':
+      return `radial-gradient(circle, ${line} 0 2px, transparent 2.5px) 0 0 / 9px 9px, ${bg}`;
+    case 'fluted':
+      return `repeating-linear-gradient(90deg, rgb(255 255 255 / 0.08) 0 2px, transparent 2px 9px), radial-gradient(circle at 40% 45%, ${line} 0%, transparent 60%), ${bg}`;
+  }
+}
+
 // ---------- Vignettes ----------
 
 function backgroundPreview(background: BackgroundSettings, images: CustomBackground[]): string {
   if (background.kind === 'animated') return presetPreview(ANIMATED_PRESETS[background.preset]);
+  if (background.kind === 'pattern') {
+    const def = PATTERNS.find((p) => p.id === background.pattern) ?? PATTERNS[0];
+    return patternPreview(def, background.patternBg, background.patternLine);
+  }
   if (background.kind === 'image') {
     const image = images.find((i) => i.id === background.imageId);
     return image ? `center / cover no-repeat url("${image.dataUrl}")` : presetPreview(ANIMATED_PRESETS.forge);
@@ -401,6 +426,30 @@ export default function CustomizePage() {
                 />
               </Tile>
             ))}
+            {PATTERNS.map((def) => {
+              const selected = background.kind === 'pattern' && background.pattern === def.id;
+              return (
+                <Tile
+                  key={def.id}
+                  label={def.label}
+                  selected={selected}
+                  onClick={() =>
+                    setBackground(
+                      selected ? {} : { kind: 'pattern', pattern: def.id, patternBg: def.bg, patternLine: def.line },
+                    )
+                  }
+                >
+                  <span
+                    className="block h-28 rounded-2xl border border-white/10"
+                    style={{
+                      background: selected
+                        ? patternPreview(def, background.patternBg, background.patternLine)
+                        : patternPreview(def, def.bg, def.line),
+                    }}
+                  />
+                </Tile>
+              );
+            })}
             <Tile label="Uni" selected={background.kind === 'solid'} onClick={() => setBackground({ kind: 'solid' })}>
               <span className="block h-28 rounded-2xl border border-white/10" style={{ background: background.color }} />
             </Tile>
@@ -417,7 +466,7 @@ export default function CustomizePage() {
           </TileRow>
 
           <Card className="space-y-5">
-            {background.kind === 'animated' && (
+            {(background.kind === 'animated' || background.kind === 'pattern') && (
               <>
                 <Slider
                   label="Vitesse"
@@ -437,6 +486,28 @@ export default function CustomizePage() {
                   format={(v) => `${Math.round(v * 100)} %`}
                   onChange={(intensity) => setBackground({ intensity })}
                 />
+              </>
+            )}
+            {background.kind === 'pattern' && (
+              <>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted">Lignes</p>
+                  <ColorChoice
+                    label="Couleur des lignes"
+                    value={background.patternLine}
+                    swatches={LINE_SWATCHES}
+                    onChange={(patternLine) => setBackground({ patternLine })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted">Fond</p>
+                  <ColorChoice
+                    label="Couleur du fond"
+                    value={background.patternBg}
+                    swatches={BACKGROUND_SWATCHES}
+                    onChange={(patternBg) => setBackground({ patternBg })}
+                  />
+                </div>
               </>
             )}
             {background.kind === 'solid' && (

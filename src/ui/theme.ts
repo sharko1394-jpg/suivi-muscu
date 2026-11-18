@@ -109,14 +109,15 @@ export function tintFor(background: BackgroundSettings): Tint {
   if (background.kind === 'image') {
     return { surface: [20, 20, 24], glass: [38, 38, 44], base: '#0e0e10' };
   }
+  const base = background.kind === 'pattern' ? background.patternBg : background.color;
   const color =
     background.kind === 'gradient'
       ? mix(hexToRgb(background.color), hexToRgb(background.color2), 0.5)
-      : hexToRgb(background.color);
+      : hexToRgb(base);
   return {
     surface: mix(color, NEUTRAL, 0.84),
     glass: mix(color, NEUTRAL, 0.7),
-    base: background.color,
+    base,
   };
 }
 
@@ -212,6 +213,7 @@ export function fallbackColors(preset: AnimatedPreset): [string, string, string,
 
 /** Fond uni ou dégradé, en CSS. */
 export function flatBackground(background: BackgroundSettings): string {
+  if (background.kind === 'pattern') return background.patternBg;
   return background.kind === 'gradient'
     ? `linear-gradient(165deg, ${background.color}, ${background.color2})`
     : background.color;

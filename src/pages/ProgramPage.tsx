@@ -24,11 +24,13 @@ import {
 import { Button, Card, ConfirmDialog, PageHeader, Section } from '../ui/components';
 import { HeaderButton, SegmentedControl } from '../ui/controls';
 import { messageOf, plural } from '../ui/format';
+import { MUSCLE_LABELS } from '../data';
 import { IconChevronRight, IconPlus } from '../ui/icons';
 import { ActionSheet, PromptDialog, type SheetAction } from '../ui/overlays';
 import { SortableList } from '../ui/SortableList';
 import { useToast } from '../ui/toast';
 import { PROGRAM_LIST, programPath, workoutPath } from './ProgramListPage';
+import { ProgramVolumeCard, useExerciseMap, workoutMuscles } from './ProgramVolume';
 
 const selectClass =
   'h-13 w-full rounded-2xl border border-line bg-raised px-3 text-ink outline-none focus:border-accent';
@@ -59,6 +61,7 @@ function ProgramView({ program, workouts }: { program: Program; workouts: Progra
   const [renaming, setRenaming] = useState(false);
   const [addingWorkout, setAddingWorkout] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const exercises = useExerciseMap();
 
   /** Lance une action et affiche l'erreur éventuelle. */
   const run = (task: () => Promise<unknown>) => {
@@ -140,6 +143,12 @@ function ProgramView({ program, workouts }: { program: Program; workouts: Progra
           </Card>
         )}
 
+        {workouts.some((w) => w.items.length > 0) && (
+          <Section title="Séries par semaine">
+            <ProgramVolumeCard program={program} workouts={workouts} />
+          </Section>
+        )}
+
         <Section title="Séances">
           {workouts.length === 0 ? (
             <Card>
@@ -163,8 +172,13 @@ function ProgramView({ program, workouts }: { program: Program; workouts: Progra
                   >
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-lg font-semibold">{workout.name}</p>
-                      <p className="text-sm text-muted">
+                      <p className="line-clamp-2 text-sm text-muted">
                         {plural(workout.items.length, 'exercice')}
+                        {workoutMuscles(workout.items, exercises).length > 0 &&
+                          ` · ${workoutMuscles(workout.items, exercises)
+                            .slice(0, 3)
+                            .map((m) => MUSCLE_LABELS[m.muscle])
+                            .join(', ')}`}
                       </p>
                     </div>
                     {program.scheduleMode === 'rotation' && workout.id === nextWorkoutId && (
@@ -220,17 +234,11 @@ function ProgramView({ program, workouts }: { program: Program; workouts: Progra
                 {workouts.length === 0 ? (
                   <p className="text-muted">Ajoute d’abord une séance pour la placer sur un jour.</p>
                 ) : (
-                  <div className="space-y-2">
-                    {WEEKDAYS.map((day) => (
-                      <DayRow
-                        key={day}
-                        day={day}
-                        workoutId={program.fixedDays[day] ?? null}
-                        workouts={workouts}
-                        onChange={(workoutId) => run(() => setFixedDay(program.id, day, workoutId))}
-                      />
-                    ))}
-                  </div>
+                  <WeekPlanner
+                    program={program}
+                    workouts={workouts}
+                    onSet={(day, workoutId) => run(() => setFixedDay(program.id, day, workoutId))}
+                  />
                 )}
               </>
             )}
@@ -290,32 +298,53 @@ function ProgramView({ program, workouts }: { program: Program; workouts: Progra
   );
 }
 
-function DayRow({
-  day,
-  workoutId,
+/** La semaine en 7 tuiles : un appui sur un jour pour y placer une séance, ou le repos. */
+function WeekPlanner({
+  program,
   workouts,
-  onChange,
+  onSet,
 }: {
-  day: Weekday;
-  workoutId: string | null;
+  program: Program;
   workouts: ProgramWorkout[];
-  onChange: (workoutId: string | null) => void;
+  onSet: (day: Weekday, workoutId: string | null) => void;
 }) {
+  const [day, setDay] = useState<Weekday | null>(null);
   return (
-    <label className="flex items-center gap-3">
-      <span className="w-24 shrink-0 font-semibold">{WEEKDAY_LABELS[day]}</span>
-      <select
-        value={workoutId ?? ''}
-        onChange={(event) => onChange(event.target.value === '' ? null : event.target.value)}
-        className={`${selectClass} ${workoutId === null ? 'text-muted' : ''}`}
-      >
-        <option value="">Repos</option>
-        {workouts.map((workout) => (
-          <option key={workout.id} value={workout.id}>
-            {workout.name}
-          </option>
-        ))}
-      </select>
-    </label>
+    <>
+      <div className="grid grid-cols-7 gap-1.5">
+        {WEEKDAYS.map((d) => {
+          const workout = workouts.find((w) => w.id === program.fixedDays[d]);
+          return (
+            <button
+              key={d}
+              type="button"
+              onClick={() => setDay(d)}
+              aria-label={`${WEEKDAY_LABELS[d]} : ${workout?.name ?? 'repos'}`}
+              className={`flex min-h-20 min-w-0 flex-col items-center gap-1 rounded-2xl border px-0.5 py-2 active:brightness-125 ${
+                workout ? 'border-accent/60 bg-accent/20' : 'border-line bg-raised'
+              }`}
+            >
+              <span className="text-xs font-semibold text-muted">{WEEKDAY_LABELS[d].slice(0, 3)}</span>
+              <span
+                className={`w-full truncate px-0.5 text-center text-[0.66rem] font-semibold leading-tight ${
+                  workout ? 'text-ink' : 'text-muted'
+                }`}
+              >
+                {workout ? workout.name : '—'}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      <ActionSheet
+        open={day !== null}
+        title={day ? WEEKDAY_LABELS[day] : ''}
+        actions={[
+          ...workouts.map((w) => ({ label: w.name, onSelect: () => onSet(day!, w.id) })),
+          { label: 'Repos', onSelect: () => onSet(day!, null) },
+        ]}
+        onClose={() => setDay(null)}
+      />
+    </>
   );
 }

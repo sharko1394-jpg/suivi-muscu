@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import {
+  MUSCLE_LABELS,
   PLANNED_LIMITS,
   addPlannedExercise,
   deleteWorkout,
@@ -9,6 +10,7 @@ import {
   getWorkout,
   isLinkedWithNext,
   listExercises,
+  listWorkouts,
   removePlannedExercise,
   renameWorkout,
   reorderPlannedExercises,
@@ -26,12 +28,13 @@ import {
 import { Button, Card, ConfirmDialog, PageHeader } from '../ui/components';
 import { HeaderButton, Stepper, Switch, WeightField } from '../ui/controls';
 import { ExercisePicker } from '../ui/ExerciseBrowser';
-import { formatPlanned, formatRest, messageOf } from '../ui/format';
-import { IconLink, IconPlus } from '../ui/icons';
+import { formatReps, formatRest, messageOf } from '../ui/format';
+import { IconChevronRight, IconLink, IconPlus } from '../ui/icons';
 import { ActionSheet, PromptDialog, Sheet, type SheetAction } from '../ui/overlays';
 import { SortableList } from '../ui/SortableList';
 import { useToast } from '../ui/toast';
 import { PROGRAM_LIST, programPath, workoutPath } from './ProgramListPage';
+import { MuscleChips, ProgramVolumeCard, workoutMuscles } from './ProgramVolume';
 
 /** État du sélecteur d'exercices : ajout, ou remplacement d'un exercice précis. */
 type Picking = { mode: 'add' } | { mode: 'replace'; itemId: string } | null;
@@ -63,6 +66,8 @@ function WorkoutView({ workout, program }: { workout: ProgramWorkout; program: P
   const settings = useSettings();
   const exercises = useLive(() => listExercises({ includeArchived: true }), []);
   const byId = useMemo(() => new Map((exercises ?? []).map((e) => [e.id, e])), [exercises]);
+  // Toutes les séances du programme : pour le volume de la semaine.
+  const programWorkouts = useLive(() => listWorkouts(program.id), [program.id]);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [renaming, setRenaming] = useState(false);
@@ -133,6 +138,8 @@ function WorkoutView({ workout, program }: { workout: ProgramWorkout; program: P
       />
 
       <div className="space-y-4 p-4 pb-8">
+        {workout.items.length > 0 && <MuscleChips items={workout.items} exercises={byId} />}
+
         {workout.items.length === 0 ? (
           <Card>
             <p className="text-muted">
@@ -160,7 +167,10 @@ function WorkoutView({ workout, program }: { workout: ProgramWorkout; program: P
                     className="min-w-0 flex-1 py-3 pr-4 text-left active:bg-raised"
                   >
                     <p className="text-lg font-semibold leading-snug">{nameOf(item)}</p>
-                    <p className="text-sm text-muted">{formatPlanned(item)}</p>
+                    <p className="text-sm text-muted">
+                      {item.sets} × {formatReps(item.repMin, item.repMax)}
+                      {byId.get(item.exerciseId) ? ` · ${MUSCLE_LABELS[byId.get(item.exerciseId)!.primaryMuscle]}` : ''}
+                    </p>
                     {item.note !== '' && (
                       <p className="mt-0.5 text-sm text-ink/80">«&nbsp;{item.note}&nbsp;»</p>
                     )}
@@ -181,6 +191,22 @@ function WorkoutView({ workout, program }: { workout: ProgramWorkout; program: P
           <IconPlus />
           Ajouter un exercice
         </Button>
+
+        {programWorkouts && programWorkouts.some((w) => w.items.length > 0) && (
+          <details className="group space-y-3 pt-2">
+            <summary className="flex min-h-12 cursor-pointer list-none items-center gap-2 px-1">
+              <span className="min-w-0 flex-1 text-[0.8rem] font-semibold uppercase tracking-[0.12em] text-muted">
+                Séries par semaine · tout le programme
+              </span>
+              <IconChevronRight className="size-5 shrink-0 text-muted transition-transform group-open:rotate-90" />
+            </summary>
+            <ProgramVolumeCard
+              program={program}
+              workouts={programWorkouts}
+              highlight={new Set(workoutMuscles(workout.items, byId).map((m) => m.muscle))}
+            />
+          </details>
+        )}
 
       </div>
 

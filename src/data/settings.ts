@@ -54,6 +54,8 @@ export interface Settings {
   profile: Profile;
   /** Objectif de l'onglet Nutrition. */
   nutritionGoal: NutritionGoal;
+  /** Programme en rotation : séances par semaine, pour estimer le volume prévu. */
+  rotationPerWeek: number;
 }
 
 export interface RestTimer {
@@ -85,6 +87,7 @@ export const DEFAULT_SETTINGS: Settings = {
   recapSeen: { month: null, year: null },
   profile: DEFAULT_PROFILE,
   nutritionGoal: 'maintain',
+  rotationPerWeek: 3,
 };
 
 function normalizeRecapSeen(raw: unknown): RecapSeen {
@@ -113,6 +116,8 @@ export async function getSettings(database: AppDB = db): Promise<Settings> {
   settings.personalGoals = normalizeGoals(stored.personalGoals);
   settings.recapSeen = normalizeRecapSeen(stored.recapSeen);
   settings.profile = normalizeProfile(stored.profile);
+  const perWeek = Number(stored.rotationPerWeek);
+  settings.rotationPerWeek = Number.isInteger(perWeek) && perWeek >= 1 && perWeek <= 14 ? perWeek : 3;
   if (!['cut', 'maintain', 'bulk'].includes(settings.nutritionGoal)) settings.nutritionGoal = 'maintain';
   return settings;
 }

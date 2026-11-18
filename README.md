@@ -48,6 +48,13 @@ données : ce que tu saisis dans l'une n'apparaît pas dans l'autre.
   (et en janvier, celle de l'année). Tu peux aussi ouvrir le bilan de n'importe quel mois avec le
   bouton **« Bilan »** de l'Historique, et partager son image.
 
+## Créer son programme
+
+En haut de chaque programme, « Séries par semaine » montre combien de séries chaque groupe
+musculaire reçoit, comparé à la zone conseillée pour ton objectif (onglet Conseils) : jaune = pas
+assez, rouge = beaucoup. Dans une séance, les pastilles du haut montrent les muscles travaillés.
+En rotation, règle le nombre de séances par semaine avec − et +.
+
 ## Nutrition
 
 1. Remplis d'abord **Réglages → Mon profil** : sexe, date de naissance, taille, poids, ton travail
@@ -80,7 +87,7 @@ Tout se règle dans **Réglages → Personnaliser l'appli**, et s'applique tout 
 
 - **Thèmes** : touche un thème pour l'essayer. « Défaut » remet l'apparence d'origine.
   « Enregistrer » garde ta création dans « Mes thèmes ».
-- **Couleur principale**, **fond** (animé, uni, dégradé ou **ta propre photo**), **cartes**
+- **Couleur principale**, **fond** (animé, en lignes comme une carte topographique, uni, dégradé ou **ta propre photo**), **cartes**
   (opacité, flou, coins), **texte** (police, taille) et **animations**.
 - **Ta photo en fond** : dans **Fond**, touche la première vignette **« Galerie »**, puis
   **« Photothèque »** dans le menu de l'iPhone, et choisis ta photo.

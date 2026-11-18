@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ANIMATED_PRESETS, type BackgroundSettings, type Effects, type MotionChoice } from '../data';
 import { onAmbient } from './ambient';
+import { PatternBackground } from './PatternBackground';
 import { fallbackColors, flatBackground } from './theme';
 
 /*
@@ -494,6 +495,13 @@ export function LiquidBackground({ config }: { config: AmbientConfig }) {
           ref={canvasRef}
           className="block h-full w-full transition-opacity duration-700"
           style={{ opacity: kind === 'animated' ? 1 : 0 }}
+        />
+      )}
+
+      {background && kind === 'pattern' && (
+        <PatternBackground
+          background={background}
+          still={reducedMotion(config, window.matchMedia('(prefers-reduced-motion: reduce)'))}
         />
       )}
 

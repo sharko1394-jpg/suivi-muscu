@@ -91,7 +91,29 @@ export const widgetDef = (id: WidgetId): WidgetDef => WIDGETS.find((w) => w.id =
 // ---------- Fonds ----------
 
 /** Fond animé (dessiné en continu), couleur unie, dégradé, ou photo de l'utilisateur. */
-export type BackgroundKind = 'animated' | 'solid' | 'gradient' | 'image';
+export type BackgroundKind = 'animated' | 'solid' | 'gradient' | 'image' | 'pattern';
+
+/** Fonds en lignes (2.3) : dessinés en continu, deux couleurs (fond et lignes). */
+export type PatternId = 'contours' | 'waves' | 'grid' | 'dots' | 'fluted';
+
+export interface PatternDef {
+  id: PatternId;
+  label: string;
+  /** Couleurs proposées en le choisissant. */
+  bg: string;
+  line: string;
+}
+
+export const PATTERNS: PatternDef[] = [
+  { id: 'contours', label: 'Lignes de niveau', bg: '#0f1a14', line: '#c9e265' },
+  { id: 'waves', label: 'Ondes', bg: '#0a1220', line: '#5fb4ff' },
+  { id: 'grid', label: 'Grille', bg: '#101014', line: '#ff5c52' },
+  { id: 'dots', label: 'Trame', bg: '#130d1d', line: '#c084fc' },
+  { id: 'fluted', label: 'Verre cannelé', bg: '#170b0d', line: '#ff6b4a' },
+];
+
+export const PATTERN_IDS = PATTERNS.map((p) => p.id);
+export const patternDef = (id: PatternId): PatternDef => PATTERNS.find((p) => p.id === id)!;
 
 export type AnimatedPresetId = 'forge' | 'ocean' | 'aurora' | 'emerald' | 'sunset' | 'graphite' | 'gold';
 
@@ -307,6 +329,10 @@ export interface BackgroundSettings {
   imageBlur: number;
   /** Assombrissement de la photo, de 0 à 1, pour garder le texte lisible. */
   imageDim: number;
+  /** Fond en lignes : motif et ses deux couleurs. */
+  pattern: PatternId;
+  patternBg: string;
+  patternLine: string;
 }
 
 export const BACKGROUND_LIMITS = {
@@ -378,6 +404,9 @@ export const DEFAULT_BACKGROUND: BackgroundSettings = {
   imageId: null,
   imageBlur: 0,
   imageDim: 0.35,
+  pattern: 'contours',
+  patternBg: '#0f1a14',
+  patternLine: '#c9e265',
 };
 
 /** L'apparence de la V1, à l'identique. */
@@ -470,6 +499,11 @@ export const THEME_PRESETS: ThemePreset[] = [
   { id: 'crepuscule', label: 'Crépuscule', look: presetLook('sunset') },
   { id: 'graphite', label: 'Graphite', look: presetLook('graphite', { font: 'system', corners: 'soft' }) },
   { id: 'or', label: 'Or', look: presetLook('gold', { corners: 'xl' }) },
+  {
+    id: 'topo',
+    label: 'Topo',
+    look: { ...DEFAULT_LOOK, accent: '#7f9f2e', background: { ...DEFAULT_BACKGROUND, kind: 'pattern', pattern: 'contours' } },
+  },
 ];
 
 // ---------- Thèmes de l'utilisateur et photos ----------
@@ -535,7 +569,7 @@ export function isValidImageDataUrl(value: unknown): value is string {
 
 export function normalizeBackground(raw: unknown, base: BackgroundSettings = DEFAULT_BACKGROUND): BackgroundSettings {
   const r = isObject(raw) ? raw : {};
-  const kind = oneOf<BackgroundKind>(r.kind, ['animated', 'solid', 'gradient', 'image'], base.kind);
+  const kind = oneOf<BackgroundKind>(r.kind, ['animated', 'solid', 'gradient', 'image', 'pattern'], base.kind);
   const imageId = typeof r.imageId === 'string' && r.imageId !== '' ? r.imageId : null;
   return {
     // Une photo sans référence n'a pas de sens : on revient au fond animé.
@@ -548,6 +582,9 @@ export function normalizeBackground(raw: unknown, base: BackgroundSettings = DEF
     imageId,
     imageBlur: clamp(r.imageBlur, BACKGROUND_LIMITS.imageBlur, base.imageBlur),
     imageDim: clamp(r.imageDim, BACKGROUND_LIMITS.imageDim, base.imageDim),
+    pattern: oneOf(r.pattern, PATTERN_IDS, base.pattern),
+    patternBg: hex(r.patternBg, base.patternBg),
+    patternLine: hex(r.patternLine, base.patternLine),
   };
 }
 
@@ -682,7 +719,9 @@ export function lookSignature(look: Look): string {
         ? [b.kind, b.color]
         : b.kind === 'gradient'
           ? [b.kind, b.color, b.color2]
-          : [b.kind, b.imageId, b.imageBlur, b.imageDim];
+          : b.kind === 'pattern'
+            ? [b.kind, b.pattern, b.patternBg, b.patternLine, b.speed, b.intensity]
+            : [b.kind, b.imageId, b.imageBlur, b.imageDim];
   return JSON.stringify([l.accent, l.cardOpacity, l.blur, l.corners, l.font, ...background]);
 }
 
